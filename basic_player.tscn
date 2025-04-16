@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://4c6qj6l4vp6q"]
+
+[ext_resource type="Script" uid="uid://d1nlbjxqspiec" path="res://basic_player.gd" id="1_ffn7p"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ffn7p"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="basic_player" type="Node2D"]
+script = ExtResource("1_ffn7p")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_ffn7p")
+
+[node name="Card1" type="Sprite2D" parent="."]
+
+[node name="Card2" type="Sprite2D" parent="."]
+
+[node name="Card3" type="Sprite2D" parent="."]
+
+[node name="Card4" type="Sprite2D" parent="."]
+
+[node name="Card5" type="Sprite2D" parent="."]
