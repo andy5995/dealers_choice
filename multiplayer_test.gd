@@ -20,11 +20,13 @@ func _on_host_pressed() -> void:
 	_add_player(1)  # Host is always player 1
 	
 func _add_player(id: int) -> void:
+	if has_node(str(id)):
+		return  # Already added
+
 	var player = player_scene.instantiate()
 	player.name = str(id)
 	call_deferred("add_child", player)
 
-	# Wait for both players to connect
 	if multiplayer.get_peers().size() == 2:
 		await get_tree().create_timer(0.5).timeout
 		deal_cards()
@@ -32,21 +34,29 @@ func _add_player(id: int) -> void:
 func _on_join_pressed() -> void:
 	peer.create_client("localhost", 61357)
 	multiplayer.multiplayer_peer = peer
-	# Connect to the 'connected' signal of the ENetMultiplayerPeer.
-	peer.connect("connected", Callable(self, "_on_client_connected"))
+	multiplayer.connected_to_server.connect(_on_client_connected)
 
 func _on_client_connected() -> void:
 	print("Client connected successfully!")
-	# Now you can safely deal cards
-	var random_card = card_names[randi() % card_names.size()]
-	var tex_path = "res://assets/cards/%s.png" % random_card
-	var card_texture = load(tex_path)
-	
-	# Ensure sprite_node is set properly on the player node
-	var player = get_node(str(multiplayer.get_peer_id()))
-	player.sprite_node.texture = card_texture
+
+	var player_id = multiplayer.get_unique_id()
+	await get_tree().create_timer(0.1).timeout  # Slight delay for node to be added
+
+	var player = get_node_or_null(str(player_id))
+	if player:
+		var random_card = card_names[randi() % card_names.size()]
+		var tex_path = "res://assets/cards/%s.png" % random_card
+		var card_texture = load(tex_path)
+
+		# Only if sprite_node exists on the player
+		if player.has_node("Sprite"):
+			player.get_node("Sprite").texture = card_texture
+	else:
+		print("Player node not found after connect")
 
 func deal_cards():
+	print("Dealing cards...")
+		
 	var deck = card_names.duplicate()
 	deck.shuffle()
 
