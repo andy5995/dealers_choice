@@ -1,20 +1,17 @@
 name: CI
 
-x-godot-paths: &godot-paths
-  paths:
-    - '**/*.gd'
-    - '**/*.tscn'
-    - '**/*.tres'
-    - 'project.godot'
-    - '.github/workflows/ci.yml'
-
 on:
   push:
     branches: [trunk]
-    <<: *godot-paths
+    paths: &godot-paths
+      - '**/*.gd'
+      - '**/*.tscn'
+      - '**/*.tres'
+      - 'project.godot'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [trunk]
-    <<: *godot-paths
+    paths: *godot-paths
 
 jobs:
   gdscript-check:
