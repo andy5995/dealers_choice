@@ -1,11 +1,8 @@
 services:
   nginx:
     image: nginx:alpine
-    ports:
-      - "22777:22777"
+    network_mode: host
     volumes:
       - ./nginx/poker.conf:/etc/nginx/conf.d/default.conf:ro
       - ./web-export:/usr/share/nginx/html:ro
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     restart: unless-stopped
