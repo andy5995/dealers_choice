@@ -1,0 +1,50 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/lobby.gd" id="1"]
+
+[node name="Lobby" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.28, 0.08, 1.0)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(400, 0)
+
+[node name="Title" type="Label" parent="Center/VBox"]
+text = "Lobby"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+
+[node name="GameLabel" type="Label" parent="Center/VBox"]
+text = "Game: "
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Center/VBox"]
+text = "0 / 5 players"
+horizontal_alignment = 1
+modulate = Color(1, 0.8, 0.3, 1)
+
+[node name="PlayerList" type="ItemList" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 160)
+
+[node name="StartBtn" type="Button" parent="Center/VBox"]
+text = "Start Game"
+visible = false
+
+[node name="BackBtn" type="Button" parent="Center/VBox"]
+text = "Leave Lobby"
+
+[connection signal="pressed" from="Center/VBox/StartBtn" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="Center/VBox/BackBtn"  to="." method="_on_back_pressed"]

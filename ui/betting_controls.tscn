@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/betting_controls.gd" id="1"]
+
+[node name="BettingControls" type="Control"]
+script = ExtResource("1")
+visible = false
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Row1" type="HBoxContainer" parent="VBox"]
+alignment = 1
+
+[node name="FoldBtn" type="Button" parent="VBox/Row1"]
+text = "Fold"
+
+[node name="CallCheckBtn" type="Button" parent="VBox/Row1"]
+text = "Check"
+
+[node name="RaiseBtn" type="Button" parent="VBox/Row1"]
+text = "Bet / Raise"
+
+[node name="RaiseRow" type="HBoxContainer" parent="VBox"]
+visible = false
+alignment = 1
+
+[node name="RaiseSlider" type="HSlider" parent="VBox/RaiseRow"]
+custom_minimum_size = Vector2(200, 0)
+
+[node name="RaiseLabel" type="Label" parent="VBox/RaiseRow"]
+text = "Raise to: 0"
+
+[node name="ConfirmRaiseBtn" type="Button" parent="VBox/RaiseRow"]
+text = "Confirm"
+
+[connection signal="pressed" from="VBox/Row1/FoldBtn"        to="." method="_on_fold_pressed"]
+[connection signal="pressed" from="VBox/Row1/CallCheckBtn"   to="." method="_on_call_check_pressed"]
+[connection signal="pressed" from="VBox/Row1/RaiseBtn"       to="." method="_on_raise_btn_pressed"]
+[connection signal="value_changed" from="VBox/RaiseRow/RaiseSlider" to="." method="_on_raise_slider_changed"]
+[connection signal="pressed" from="VBox/RaiseRow/ConfirmRaiseBtn"   to="." method="_on_confirm_raise_pressed"]
