@@ -10,7 +10,7 @@ extends Node2D
 
 const SEAT_SCENE      := preload("res://ui/player_seat.tscn")
 const BETTING_SCENE   := preload("res://ui/betting_controls.tscn")
-const CARD_VIEW_SCENE := preload("res://ui/card_view.tscn")
+const _CardView = preload("res://ui/card_view.tscn")
 const _FiveCardDraw   := preload("res://games/five_card_draw.gd")
 const _TexasHoldem    := preload("res://games/texas_holdem.gd")
 const _SevenCardStud  := preload("res://games/seven_card_stud.gd")
@@ -166,7 +166,7 @@ func _update_community_cards(cards: Array) -> void:
 	for child in _community_box.get_children():
 		child.queue_free()
 	for card_name in cards:
-		var cv = CARD_VIEW_SCENE.instantiate()
+		var cv = _CardView.instantiate()
 		_community_box.add_child(cv)
 		cv.show_card(card_name, true)
 

@@ -3,19 +3,4 @@
 [ext_resource type="Script" path="res://ui/card_view.gd" id="1"]
 
 [node name="CardView" type="Control"]
-custom_minimum_size = Vector2(72, 100)
 script = ExtResource("1")
-
-[node name="CardTexture" type="TextureRect" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-expand_mode = 1
-stretch_mode = 6
-
-[node name="SelectOverlay" type="ColorRect" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(1, 1, 0, 0.35)
-visible = false

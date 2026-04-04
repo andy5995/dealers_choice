@@ -24,8 +24,3 @@ func rank_display(card: String) -> String:
 	var r := card.substr(0, 1)
 	return "10" if r == "T" else r
 
-func load_texture(card_name: String) -> Texture2D:
-	var path := "res://assets/cards/%s.png" % card_name
-	if ResourceLoader.exists(path):
-		return load(path) as Texture2D
-	return load("res://assets/cards/%s.png" % BACK_CARD) as Texture2D

@@ -3,7 +3,7 @@ extends Control
 ## Displays one player's seat: name, chips, bet, status, and cards.
 ## Uses untyped Array for card views to avoid class_name registry dependency.
 
-const CARD_SCENE := preload("res://ui/card_view.tscn")
+const _CardView = preload("res://ui/card_view.tscn")
 
 var peer_id: int = 0
 var _card_views: Array = []   # holds CardView nodes
@@ -91,7 +91,7 @@ func _show_stud_private(hand: Array, face_down: Array) -> void:
 
 func _set_card_count(count: int) -> void:
 	while _card_views.size() < count:
-		var cv = CARD_SCENE.instantiate()
+		var cv = _CardView.instantiate()
 		_cards_box.add_child(cv)
 		_card_views.append(cv)
 	while _card_views.size() > count:

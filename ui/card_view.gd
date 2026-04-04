@@ -1,24 +1,32 @@
 class_name CardView
 extends Control
-## Displays one playing card. Can be toggled selected (for draw phase discards).
+## Displays one playing card using 2D draw calls — no texture assets required.
+## Landscape orientation: wider than tall.
 
 signal selection_changed(card_name: String, selected: bool)
 
 var card_name: String = ""
-var is_face_up: bool = true
+var is_face_up: bool  = true
 var is_selectable: bool = false
-var is_selected: bool = false
+var is_selected: bool   = false
 
-@onready var _texture_rect: TextureRect = $CardTexture
-@onready var _overlay: ColorRect     = $SelectOverlay
+const SUIT_SYMBOLS = {"C": "♣", "D": "♦", "H": "♥", "S": "♠"}
+const _RED         = Color(0.82, 0.10, 0.10)
+const _BLACK       = Color(0.08, 0.08, 0.08)
+const _CARD_BG     = Color(0.98, 0.97, 0.95)
+const _CARD_BORDER = Color(0.30, 0.30, 0.30)
+const _BACK_BG     = Color(0.14, 0.28, 0.65)
+const _BACK_STRIPE = Color(0.10, 0.20, 0.50)
+const _SELECT_TINT = Color(1.0, 0.9, 0.0, 0.40)
+const _BACK_BORDER = Color(0.08, 0.18, 0.48)
+
+func _ready() -> void:
+	custom_minimum_size = Vector2(80, 56)
 
 func show_card(name: String, face_up: bool = true) -> void:
 	card_name = name
 	is_face_up = face_up
-	if face_up:
-		_texture_rect.texture = CardDB.load_texture(name)
-	else:
-		_texture_rect.texture = CardDB.load_texture(CardDB.BACK_CARD)
+	queue_redraw()
 
 func set_selectable(enabled: bool) -> void:
 	is_selectable = enabled
@@ -28,7 +36,7 @@ func set_selectable(enabled: bool) -> void:
 
 func _set_selected(value: bool) -> void:
 	is_selected = value
-	_overlay.visible = value
+	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
 	if not is_selectable:
@@ -36,3 +44,48 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_set_selected(not is_selected)
 		selection_changed.emit(card_name, is_selected)
+
+func _draw() -> void:
+	var r := Rect2(Vector2.ZERO, size)
+	if is_face_up and card_name != CardDB.BACK_CARD:
+		_draw_face(r)
+	else:
+		_draw_back(r)
+	if is_selected:
+		draw_rect(r, _SELECT_TINT)
+
+func _draw_face(r: Rect2) -> void:
+	draw_rect(r, _CARD_BG)
+	draw_rect(r, _CARD_BORDER, false, 1.5)
+	if card_name.length() < 2:
+		return
+	var suit_ch: String  = CardDB.suit_char(card_name)
+	var rank_str: String = CardDB.rank_display(card_name)
+	var sym: String      = SUIT_SYMBOLS.get(suit_ch, "?")
+	var col: Color       = _RED if suit_ch in ["D", "H"] else _BLACK
+	var font: Font       = ThemeDB.fallback_font
+
+	# Rank on the left, vertically centred
+	var rank_sz := 30
+	var ry: float = (r.size.y + rank_sz * 0.72) * 0.5
+	draw_string(font, Vector2(6.0, ry), rank_str, HORIZONTAL_ALIGNMENT_LEFT, -1, rank_sz, col)
+
+	# Suit on the right, vertically centred
+	var suit_sz := 26
+	var sw: float = font.get_string_size(sym, HORIZONTAL_ALIGNMENT_LEFT, -1, suit_sz).x
+	var sx: float = r.size.x - sw - 6.0
+	var sy: float = (r.size.y + suit_sz * 0.72) * 0.5
+	draw_string(font, Vector2(sx, sy), sym, HORIZONTAL_ALIGNMENT_LEFT, -1, suit_sz, col)
+
+func _draw_back(r: Rect2) -> void:
+	draw_rect(r, _BACK_BG)
+	# Diagonal cross-hatch
+	var step := 8.0
+	var w    := r.size.x
+	var h    := r.size.y
+	var i    := -h
+	while i < w + h:
+		draw_line(Vector2(i, 0),     Vector2(i + h, h), _BACK_STRIPE, 1.0)
+		draw_line(Vector2(i + h, 0), Vector2(i, h),     _BACK_STRIPE, 1.0)
+		i += step
+	draw_rect(r, _BACK_BORDER, false, 1.5)
