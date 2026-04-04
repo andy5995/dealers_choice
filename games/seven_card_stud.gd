@@ -4,8 +4,6 @@ extends "res://games/base_game.gd"
 ## 5 betting rounds total (3rd through 7th street).
 ## On 4th–6th street, player with best visible hand acts first.
 
-const _HandEval := preload("res://core/hand_evaluator.gd")
-
 var _street: int = 0  # 3 = third street ... 7 = seventh street
 
 func _start_hand_impl() -> void:
@@ -37,7 +35,7 @@ func _advance_phase() -> void:
 func _deal_up_cards() -> void:
 	for p in _players:
 		if p.status != PS_FOLDED:
-			var card := _deck.draw()
+			var card: String = _deck.draw()
 			p.face_up_cards.append(card)
 			p.hand.append(card)
 
@@ -45,7 +43,7 @@ func _deal_seventh_street() -> void:
 	# If deck runs low, deal one shared community down-card
 	var active_count := _count_non_folded()
 	if _deck.cards_remaining() < active_count:
-		var shared := _deck.draw()
+		var shared: String = _deck.draw()
 		for p in _players:
 			if p.status != PS_FOLDED:
 				p.face_down_cards.append(shared)
@@ -53,7 +51,7 @@ func _deal_seventh_street() -> void:
 	else:
 		for p in _players:
 			if p.status != PS_FOLDED:
-				var card := _deck.draw()
+				var card: String = _deck.draw()
 				p.face_down_cards.append(card)
 				p.hand.append(card)
 

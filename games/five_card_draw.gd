@@ -95,6 +95,6 @@ func _execute_draws() -> void:
 			if idx < p.hand.size():
 				p.hand.remove_at(idx)
 		# Draw replacements
-		var new_cards := _deck.draw_n(indices.size())
+		var new_cards: Array = _deck.draw_n(indices.size())
 		p.hand.append_array(new_cards)
 	_last_action_text = "Cards drawn"
