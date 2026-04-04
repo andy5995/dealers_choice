@@ -23,7 +23,7 @@ anchor_bottom = 1.0
 custom_minimum_size = Vector2(400, 0)
 
 [node name="Title" type="Label" parent="Center/VBox"]
-text = "Dealer's Choice"
+text = "That GD Poker Suite"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 36
 
