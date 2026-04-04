@@ -1,5 +1,5 @@
 class_name SevenCardStud
-extends BaseGame
+extends preload("res://games/base_game.gd")
 ## 7-Card Stud: ante → (2 down + 1 up) → bet → (3 more up, betting after each) → (1 down) → bet → showdown.
 ## 5 betting rounds total (3rd through 7th street).
 ## On 4th–6th street, player with best visible hand acts first.

@@ -1,5 +1,5 @@
 class_name TexasHoldem
-extends BaseGame
+extends preload("res://games/base_game.gd")
 ## Texas Hold'em: ante → 2 hole cards → preflop bet → flop → bet → turn → bet → river → bet → showdown.
 ## Uses antes only (no blinds). First player left of dealer acts first every round.
 

@@ -1,5 +1,5 @@
 class_name FiveCardDraw
-extends BaseGame
+extends preload("res://games/base_game.gd")
 ## 5-Card Draw: ante → deal 5 → bet → draw → bet → showdown.
 
 var _discard_responses: Dictionary = {}  # peer_id -> Array[int] indices
