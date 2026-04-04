@@ -29,7 +29,7 @@ const SEAT_POSITIONS := [
 var _game          = null   # BaseGame subclass, server only
 var _seat_nodes: Array = [] # PlayerSeat nodes
 var _betting_ctrl  = null   # BettingControls node
-var _peer_order: Array[int] = []
+var _peer_order: Array = []
 var _my_peer_id: int = 0
 
 @onready var _pot_label:       Label         = $UI/PotLabel
