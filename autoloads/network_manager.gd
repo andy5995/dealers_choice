@@ -10,8 +10,9 @@ signal connected_to_server()
 signal server_disconnected()
 signal lobby_updated()  ## fired on ALL peers whenever the player list changes
 
-const PORT := 22777
-const MAX_PLAYERS := 5
+const PORT         := 22777  ## public-facing port (nginx)
+const SERVER_PORT  := 22778  ## internal Godot WebSocket server port (not forwarded)
+const MAX_PLAYERS  := 5
 
 var peer: WebSocketMultiplayerPeer = null
 ## Maps peer_id -> display name, maintained on all peers via _sync_player_names RPC.
@@ -23,7 +24,7 @@ func _process(_delta: float) -> void:
 
 func host(my_name: String) -> Error:
 	peer = WebSocketMultiplayerPeer.new()
-	var err := peer.create_server(PORT)
+	var err := peer.create_server(SERVER_PORT)
 	if err != OK:
 		peer = null
 		return err
@@ -35,7 +36,7 @@ func host(my_name: String) -> Error:
 
 func join(address: String, my_name: String) -> Error:
 	peer = WebSocketMultiplayerPeer.new()
-	var err := peer.create_client("ws://%s:%d" % [address, PORT])
+	var err := peer.create_client("ws://%s:%d/ws" % [address, PORT])
 	if err != OK:
 		peer = null
 		return err
