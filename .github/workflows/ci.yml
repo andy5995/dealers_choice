@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  gdscript-check:
+    name: GDScript syntax check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot binary
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: godot
+          key: godot-4.6.1-stable-linux
+
+      - name: Download Godot 4.6.1
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          wget -q "https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip" -O godot.zip
+          unzip -q godot.zip
+          mv Godot_v4.6.1-stable_linux.x86_64 godot
+          chmod +x godot
+
+      - name: Check GDScript for errors
+        run: ./godot --headless --path . --check-only --quit
