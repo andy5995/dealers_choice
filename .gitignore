@@ -5,3 +5,6 @@
 # Web export output (regenerate with Project → Export)
 /web-export/*
 !/web-export/.gitkeep
+
+# TLS certificates (generate with openssl, never commit private keys)
+/nginx/certs/

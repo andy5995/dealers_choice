@@ -40,6 +40,17 @@ func _on_join_pressed() -> void:
 	var ip := _ip_input.text.strip_edges()
 	if ip.is_empty():
 		ip = "127.0.0.1"
+	# Strip any protocol prefix or port the user may have pasted in
+	for prefix in ["https://", "http://", "wss://", "ws://"]:
+		if ip.begins_with(prefix):
+			ip = ip.substr(prefix.length())
+			break
+	# Strip trailing :port
+	var colon := ip.rfind(":")
+	if colon != -1 and ip.substr(colon + 1).is_valid_int():
+		ip = ip.substr(0, colon)
+	# Strip trailing slashes
+	ip = ip.rstrip("/")
 
 	var err := NetworkManager.join(ip, name)
 	if err != OK:

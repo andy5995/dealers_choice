@@ -4,5 +4,6 @@ services:
     network_mode: host
     volumes:
       - ./nginx/poker.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
       - ./web-export:/usr/share/nginx/html:ro
     restart: unless-stopped
