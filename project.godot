@@ -17,6 +17,7 @@ run/main_scene="res://scenes/main_menu.tscn"
 
 [autoload]
 
+Preloader="*res://autoloads/preloader.gd"
 CardDB="*res://autoloads/card_db.gd"
 NetworkManager="*res://autoloads/network_manager.gd"
 GameManager="*res://autoloads/game_manager.gd"

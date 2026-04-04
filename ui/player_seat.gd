@@ -100,5 +100,4 @@ func _set_card_count(count: int) -> void:
 		_cards_box.add_child(cv)
 		_card_views.append(cv)
 	while _card_views.size() > count:
-		var cv := _card_views.pop_back()
-		cv.queue_free()
+		(_card_views.pop_back() as Node).queue_free()

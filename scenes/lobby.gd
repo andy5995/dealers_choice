@@ -6,7 +6,7 @@ extends Control
 @onready var _game_label:  Label    = $Center/VBox/GameLabel
 
 func _ready() -> void:
-	NetworkManager.player_connected.connect(_refresh_player_list)
+	NetworkManager.lobby_updated.connect(_refresh_player_list)
 	NetworkManager.player_disconnected.connect(_refresh_player_list)
 	NetworkManager.server_disconnected.connect(_on_server_disconnected)
 

@@ -8,6 +8,7 @@ signal player_disconnected(peer_id: int)
 signal connection_failed()
 signal connected_to_server()
 signal server_disconnected()
+signal lobby_updated()  ## fired on ALL peers whenever the player list changes
 
 const PORT := 61357
 const MAX_PLAYERS := 5
@@ -95,3 +96,4 @@ func _register_with_server(player_name: String) -> void:
 @rpc("authority", "call_local", "reliable")
 func _sync_player_names(names: Dictionary) -> void:
 	player_names = names
+	lobby_updated.emit()

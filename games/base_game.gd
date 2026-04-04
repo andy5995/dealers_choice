@@ -10,8 +10,9 @@ extends Node
 ##   client → server      : submit_action / submit_discards
 
 # Reference to GameTable node (which owns the RPC methods).
-# Typed as Node to avoid circular dependency; duck-typed at runtime.
-var _table: Node
+# Left untyped so duck-typed RPC calls (_table.receive_public_state.rpc etc.)
+# don't require GameTable to be in scope at compile time.
+var _table
 
 var _deck: Deck
 var _players: Array[PlayerState] = []
