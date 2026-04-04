@@ -1,8 +1,10 @@
 class_name SevenCardStud
-extends preload("res://games/base_game.gd")
+extends "res://games/base_game.gd"
 ## 7-Card Stud: ante → (2 down + 1 up) → bet → (3 more up, betting after each) → (1 down) → bet → showdown.
 ## 5 betting rounds total (3rd through 7th street).
 ## On 4th–6th street, player with best visible hand acts first.
+
+const _HandEval := preload("res://core/hand_evaluator.gd")
 
 var _street: int = 0  # 3 = third street ... 7 = seventh street
 
@@ -34,7 +36,7 @@ func _advance_phase() -> void:
 
 func _deal_up_cards() -> void:
 	for p in _players:
-		if p.status != PlayerState.Status.FOLDED:
+		if p.status != PS_FOLDED:
 			var card := _deck.draw()
 			p.face_up_cards.append(card)
 			p.hand.append(card)
@@ -45,12 +47,12 @@ func _deal_seventh_street() -> void:
 	if _deck.cards_remaining() < active_count:
 		var shared := _deck.draw()
 		for p in _players:
-			if p.status != PlayerState.Status.FOLDED:
+			if p.status != PS_FOLDED:
 				p.face_down_cards.append(shared)
 				p.hand.append(shared)
 	else:
 		for p in _players:
-			if p.status != PlayerState.Status.FOLDED:
+			if p.status != PS_FOLDED:
 				var card := _deck.draw()
 				p.face_down_cards.append(card)
 				p.hand.append(card)
@@ -61,8 +63,8 @@ func _deal_seventh_street() -> void:
 func _bring_in_seat() -> int:
 	var lowest_seat := -1
 	for i in range(_players.size()):
-		var p := _players[i]
-		if p.status == PlayerState.Status.ACTIVE and not p.face_up_cards.is_empty():
+		var p = _players[i]
+		if p.status == PS_ACTIVE and not p.face_up_cards.is_empty():
 			if lowest_seat == -1 or _stud_card_lt(p.face_up_cards[0], _players[lowest_seat].face_up_cards[0]):
 				lowest_seat = i
 	return lowest_seat if lowest_seat != -1 else _left_of_dealer()
@@ -72,10 +74,10 @@ func _best_visible_hand_seat() -> int:
 	var best_seat := -1
 	var best_value: Array = []
 	for i in range(_players.size()):
-		var p := _players[i]
-		if p.status != PlayerState.Status.FOLDED and not p.face_up_cards.is_empty():
-			var value := HandEvaluator.best_from_n(p.face_up_cards)
-			if best_seat == -1 or HandEvaluator.compare(value, best_value) > 0:
+		var p = _players[i]
+		if p.status != PS_FOLDED and not p.face_up_cards.is_empty():
+			var value := _HandEval.best_from_n(p.face_up_cards)
+			if best_seat == -1 or _HandEval.compare(value, best_value) > 0:
 				best_seat = i
 				best_value = value
 	return best_seat if best_seat != -1 else _left_of_dealer()

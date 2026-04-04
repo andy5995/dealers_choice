@@ -1,5 +1,5 @@
 class_name TexasHoldem
-extends preload("res://games/base_game.gd")
+extends "res://games/base_game.gd"
 ## Texas Hold'em: ante → 2 hole cards → preflop bet → flop → bet → turn → bet → river → bet → showdown.
 ## Uses antes only (no blinds). First player left of dealer acts first every round.
 
@@ -28,7 +28,7 @@ func _advance_phase() -> void:
 			# All five community cards have been dealt — showdown
 			# Build full 7-card hand for each player
 			for p in _players:
-				if p.status != PlayerState.Status.FOLDED:
+				if p.status != PS_FOLDED:
 					p.hand = p.hand + _community
 			_do_showdown()
 			return

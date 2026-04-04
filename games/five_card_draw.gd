@@ -1,5 +1,5 @@
 class_name FiveCardDraw
-extends preload("res://games/base_game.gd")
+extends "res://games/base_game.gd"
 ## 5-Card Draw: ante → deal 5 → bet → draw → bet → showdown.
 
 var _discard_responses: Dictionary = {}  # peer_id -> Array[int] indices
@@ -42,7 +42,7 @@ func _request_discards_from_all() -> void:
 
 	var my_id := multiplayer.get_unique_id()
 	for p in _players:
-		if p.status == PlayerState.Status.ACTIVE:
+		if p.status == PS_ACTIVE:
 			if p.peer_id == my_id:
 				_table._show_draw_controls(p.hand)
 			else:
@@ -54,8 +54,8 @@ func receive_discards(peer_id: int, indices: Array) -> void:
 	var seat := _seat_of(peer_id)
 	if seat == -1:
 		return
-	var p := _players[seat]
-	if p.status != PlayerState.Status.ACTIVE:
+	var p = _players[seat]
+	if p.status != PS_ACTIVE:
 		return
 
 	# Validate: max 4 discards (or 5 with special rule — allow up to 5 here)
@@ -70,7 +70,7 @@ func receive_discards(peer_id: int, indices: Array) -> void:
 	# Check if all active players have responded
 	var all_responded := true
 	for op in _players:
-		if op.status == PlayerState.Status.ACTIVE:
+		if op.status == PS_ACTIVE:
 			if not _discard_responses.has(op.peer_id):
 				all_responded = false
 				break
@@ -85,7 +85,7 @@ func _execute_draws() -> void:
 		var seat := _seat_of(peer_id)
 		if seat == -1:
 			continue
-		var p := _players[seat]
+		var p = _players[seat]
 		var indices: Array = _discard_responses[peer_id]
 		# Remove in reverse order to preserve valid indices
 		indices = indices.duplicate()
