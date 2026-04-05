@@ -7,6 +7,7 @@ const _CardView = preload("res://ui/card_view.tscn")
 
 var peer_id: int = 0
 var _card_views: Array = []   # holds CardView nodes
+var _coin_icon: TextureRect = null
 
 @onready var _name_label:   Label         = $VBox/NameLabel
 @onready var _chips_label:  Label         = $VBox/ChipsLabel
@@ -16,7 +17,21 @@ var _card_views: Array = []   # holds CardView nodes
 @onready var _dealer_chip:  Label         = $DealerChip
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(160, 150)
+	custom_minimum_size = Vector2(240, 225)
+
+## Set the coin icon displayed next to the chip count (called once by GameTable).
+func set_coin_icon(tex: Texture2D, icon_size: int = 48) -> void:
+	if _coin_icon == null:
+		_coin_icon = TextureRect.new()
+		_coin_icon.expand_mode           = TextureRect.EXPAND_IGNORE_SIZE
+		_coin_icon.custom_minimum_size   = Vector2(icon_size, icon_size)
+		_coin_icon.stretch_mode          = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		_coin_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_coin_icon.size_flags_vertical   = Control.SIZE_SHRINK_CENTER
+		var vbox = _chips_label.get_parent()
+		vbox.add_child(_coin_icon)
+		vbox.move_child(_coin_icon, _chips_label.get_index())
+	_coin_icon.texture = tex
 
 ## Update publicly-visible player info (sent to all).
 func update_public(data: Dictionary) -> void:

@@ -5,9 +5,6 @@ extends Control
 ## The brown wedge grows clockwise from 12 o'clock as time elapses.
 ## A 3D border ring is lit from the top-left and shaded toward the bottom-right.
 
-const OUTER_R  = 50.0
-const BORDER   = 10.0
-const INNER_R  = OUTER_R - BORDER   # 40
 const SEGMENTS = 64
 
 const _GREEN = Color(0.0,       0.490,  0.0)
@@ -20,7 +17,10 @@ func _set_fill(v: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var center = size * 0.5
+	var center  = size * 0.5
+	var outer_r = minf(size.x, size.y) * 0.5 - 1.0
+	var border  = outer_r * 0.2
+	var inner_r = outer_r - border
 
 	# ── 3D border ring ────────────────────────────────────────────────────────
 	# Split the ring into SEGMENTS trapezoids; shade each by the dot product of
@@ -36,14 +36,14 @@ func _draw() -> void:
 		t = (t + 1.0) * 0.5
 		var c   = (70.0 + t * 185.0) / 255.0
 		var col = Color(c, c, c)
-		var o0  = center + Vector2(cos(a0), sin(a0)) * OUTER_R
-		var o1  = center + Vector2(cos(a1), sin(a1)) * OUTER_R
-		var i0  = center + Vector2(cos(a0), sin(a0)) * INNER_R
-		var i1  = center + Vector2(cos(a1), sin(a1)) * INNER_R
+		var o0  = center + Vector2(cos(a0), sin(a0)) * outer_r
+		var o1  = center + Vector2(cos(a1), sin(a1)) * outer_r
+		var i0  = center + Vector2(cos(a0), sin(a0)) * inner_r
+		var i1  = center + Vector2(cos(a1), sin(a1)) * inner_r
 		draw_colored_polygon(PackedVector2Array([o0, o1, i1, i0]), col)
 
 	# ── inner circle (table green) ────────────────────────────────────────────
-	draw_circle(center, INNER_R, _GREEN)
+	draw_circle(center, inner_r, _GREEN)
 
 	# ── brown pie wedge (elapsed time, clockwise from 12 o'clock) ────────────
 	var sweep = (1.0 - fill_ratio) * TAU
@@ -53,5 +53,5 @@ func _draw() -> void:
 		verts.append(center)
 		for j in range(n + 1):
 			var a = -PI * 0.5 + j * sweep / n   # -PI/2 = 12 o'clock in Godot coords
-			verts.append(center + Vector2(cos(a), sin(a)) * INNER_R)
+			verts.append(center + Vector2(cos(a), sin(a)) * inner_r)
 		draw_colored_polygon(verts, _BROWN)

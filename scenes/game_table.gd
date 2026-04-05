@@ -19,12 +19,27 @@ const _PlayerState    := preload("res://core/player_state.gd")
 ## Seat display positions for up to 5 players (1280×720 table).
 ## Index 0 = local player (always bottom-centre); others clockwise from left.
 const SEAT_POSITIONS := [
-	Vector2(640, 590),
-	Vector2(160, 460),
-	Vector2(160, 180),
-	Vector2(1120, 180),
-	Vector2(1120, 460),
+	Vector2(960, 885),
+	Vector2(240, 690),
+	Vector2(240, 270),
+	Vector2(1680, 270),
+	Vector2(1680, 690),
 ]
+
+## Coin image paths — loaded at runtime so missing .import files don't block parse.
+const _COIN_PATHS: Array = [
+	"res://assets/images/coins/96x96-1984_rv_marie_curie.png",
+	"res://assets/images/coins/96x96_front_1907_Saint_Gaudens_gold_coin.png",
+	"res://assets/images/coins/96x96_front_Gaius-Julius-Caesar-denarius-44-BC-RRC-480-3.png",
+	"res://assets/images/coins/96x96-head_of_Aphrodite_with_turreted_crown.png",
+	"res://assets/images/coins/96x96-Marcus Antonius - Cleopatra 32 BC 90020163_front.png",
+	"res://assets/images/coins/96x96-Marcus Antonius - Cleopatra 32 BC 90020163_back.png",
+]
+const COIN_DISPLAY_SIZE  = 96   # full 96px in the pot; icon on seats is smaller
+const MAX_POT_COINS      = 40
+## Centre of the scatter field — between community cards and player seats.
+const POT_CENTER         = Vector2(960, 735)
+const POT_SCATTER_RADIUS = 180.0
 
 var _game          = null   # BaseGame subclass, server only
 var _seat_nodes: Array = [] # PlayerSeat nodes
@@ -32,6 +47,13 @@ var _betting_ctrl  = null   # BettingControls node
 var _peer_order: Array = []
 var _my_peer_id: int = 0
 var _last_coin_action: String = ""
+
+## Coin state
+var _coin_tex: Texture2D        = null
+var _pot_root: Node2D           = null   # container drawn below seats
+var _pot_sprites: Array         = []     # Sprite2D nodes currently in the pot
+var _pot_positions: Array       = []     # precomputed scatter Vector2s (MAX_POT_COINS)
+var _prev_pot: int              = 0
 
 @onready var _pot_label:       Label         = $UI/PotLabel
 @onready var _action_log:      RichTextLabel = $UI/ActionLog
@@ -54,7 +76,26 @@ func _ready() -> void:
 	_peer_order = NetworkManager.player_names.keys()
 	_peer_order.sort()
 
+	# ── Coins ─────────────────────────────────────────────────────────────────
+	_coin_tex = load(_COIN_PATHS[randi() % _COIN_PATHS.size()])
+
+	# Precompute MAX_POT_COINS random scatter positions (stable for the session).
+	for _i in MAX_POT_COINS:
+		var angle = randf() * TAU
+		var dist  = randf() * POT_SCATTER_RADIUS
+		_pot_positions.append(POT_CENTER + Vector2(cos(angle), sin(angle)) * dist)
+
+	# Container rendered just above the table background, below seats/UI.
+	_pot_root = Node2D.new()
+	add_child(_pot_root)
+	move_child(_pot_root, 1)   # index 0 = TableBackground, 1 = pot coins
+
 	_create_seats()
+
+	# Pass coin icon to every seat.
+	if _coin_tex:
+		for seat in _seat_nodes:
+			seat.set_coin_icon(_coin_tex, COIN_DISPLAY_SIZE / 2)
 
 	_betting_ctrl = BETTING_SCENE.instantiate()
 	$UI.add_child(_betting_ctrl)
@@ -161,9 +202,12 @@ func _show_draw_controls(_hand: Array) -> void:
 # ── State application ─────────────────────────────────────────────────────────
 
 func _apply_public_state(state: Dictionary) -> void:
-	_pot_label.text = "Pot: %d" % state.get("pot", 0)
-
+	var pot: int       = state.get("pot", 0)
 	var actor_idx: int = state.get("actor_index", -1)
+
+	_pot_label.text = "Pot: %d" % pot
+	_apply_pot_coins(pot, actor_idx)
+	_prev_pot = pot
 	if actor_idx >= 0:
 		_turn_duration = state.get("turn_duration", 30.0)
 		_client_time_left = state.get("turn_time_left", 0.0)
@@ -238,6 +282,37 @@ func _on_draw_confirm_pressed() -> void:
 		_game.receive_discards(_my_peer_id, indices)
 	else:
 		submit_discards.rpc_id(1, indices)
+
+# ── Pot coin display ──────────────────────────────────────────────────────────
+
+func _apply_pot_coins(pot: int, actor_idx: int) -> void:
+	if _coin_tex == null:
+		return
+	var ante: int    = maxi(GameManager.ante_amount, 1)
+	var target: int  = mini(pot / ante, MAX_POT_COINS)
+
+	# Remove excess sprites (e.g. new hand reset).
+	while _pot_sprites.size() > target:
+		(_pot_sprites.pop_back() as Node).queue_free()
+
+	# Add new sprites, animating from the actor's seat when pot is rising.
+	while _pot_sprites.size() < target:
+		var idx: int   = _pot_sprites.size()
+		var sp         = Sprite2D.new()
+		sp.texture     = _coin_tex
+		var scale_f    = float(COIN_DISPLAY_SIZE) / 96.0
+		sp.scale       = Vector2(scale_f, scale_f)
+		sp.position    = _pot_positions[idx]
+		_pot_root.add_child(sp)
+		_pot_sprites.append(sp)
+
+		# Animate from actor seat when the pot increased.
+		if pot > _prev_pot and actor_idx >= 0 and actor_idx < _seat_nodes.size():
+			var seat       = _seat_nodes[actor_idx]
+			var start_pos: Vector2 = seat.position + Vector2(120, 112)
+			sp.position = start_pos
+			var tw = create_tween()
+			tw.tween_property(sp, "position", _pot_positions[idx], 0.3)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
