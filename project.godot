@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+AudioManager="*res://autoloads/audio_manager.gd"
 Preloader="*res://autoloads/preloader.gd"
 CardDB="*res://autoloads/card_db.gd"
 NetworkManager="*res://autoloads/network_manager.gd"

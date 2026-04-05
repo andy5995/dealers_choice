@@ -31,6 +31,7 @@ var _seat_nodes: Array = [] # PlayerSeat nodes
 var _betting_ctrl  = null   # BettingControls node
 var _peer_order: Array = []
 var _my_peer_id: int = 0
+var _last_coin_action: String = ""
 
 @onready var _pot_label:       Label         = $UI/PotLabel
 @onready var _action_log:      RichTextLabel = $UI/ActionLog
@@ -127,6 +128,7 @@ func request_discards(hand: Array) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func receive_game_over(results: Dictionary) -> void:
+	AudioManager.play_game_over()
 	_show_results(results)
 
 # ── Called directly by BaseGame for the host player ──────────────────────────
@@ -137,6 +139,7 @@ func _apply_private_state(peer_id: int, state: Dictionary) -> void:
 		seat.update_private(state)
 
 func _show_betting_controls(valid_actions: Array, bet_to_call: int, min_bet: int, my_chips: int) -> void:
+	AudioManager.play_my_turn()
 	if _betting_ctrl:
 		_betting_ctrl.setup(valid_actions, bet_to_call, min_bet, my_chips)
 
@@ -152,8 +155,11 @@ func _apply_public_state(state: Dictionary) -> void:
 	_pot_label.text = "Pot: %d" % state.get("pot", 0)
 
 	var last_action: String = state.get("last_action", "")
-	if last_action != "":
+	if last_action != "" and last_action != _last_coin_action:
+		_last_coin_action = last_action
 		_action_log.append_text(last_action + "\n")
+		if "bet" in last_action or "call" in last_action or "raise" in last_action:
+			AudioManager.play_coin_hit()
 
 	_update_community_cards(state.get("community_cards", []))
 

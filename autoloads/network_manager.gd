@@ -37,7 +37,12 @@ func host(my_name: String) -> Error:
 func join(address: String, my_name: String) -> Error:
 	disconnect_all()  # clean up any previous attempt
 	peer = WebSocketMultiplayerPeer.new()
-	var err := peer.create_client("wss://%s:%d/ws" % [address, PORT])
+	var url: String
+	if address == "127.0.0.1" or address == "localhost":
+		url = "ws://%s:%d" % [address, SERVER_PORT]
+	else:
+		url = "wss://%s:%d/ws" % [address, PORT]
+	var err := peer.create_client(url)
 	if err != OK:
 		peer = null
 		return err
