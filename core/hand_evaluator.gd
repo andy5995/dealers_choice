@@ -32,7 +32,8 @@ static func best_from_n(cards: Array) -> Array:
 	_each_combination(cards, 5, func(combo: Array) -> void:
 		var result := evaluate_five(combo)
 		if best.is_empty() or compare(result, best) > 0:
-			best = result.duplicate()
+			best.clear()
+			best.append_array(result)
 	)
 	return best
 
