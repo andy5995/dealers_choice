@@ -198,6 +198,7 @@ func _show_betting_controls(valid_actions: Array, bet_to_call: int, min_bet: int
 		_betting_ctrl.setup(valid_actions, bet_to_call, min_bet, my_chips)
 
 func _show_draw_controls(_hand: Array) -> void:
+	AudioManager.play_my_turn()
 	var my_seat = _get_seat(_my_peer_id)
 	if my_seat:
 		my_seat.enable_card_selection(true)

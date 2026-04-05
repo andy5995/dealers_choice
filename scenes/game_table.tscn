@@ -46,14 +46,14 @@ offset_bottom = 450.0
 scroll_following = true
 
 [node name="DrawPanel" type="VBoxContainer" parent="UI"]
-offset_left = 660.0
-offset_top = 930.0
-offset_right = 1260.0
-offset_bottom = 1073.0
+offset_left = 700.0
+offset_top = 740.0
+offset_right = 1220.0
+offset_bottom = 850.0
 visible = false
 
 [node name="DrawLabel" type="Label" parent="UI/DrawPanel"]
-text = "Click cards to discard, then confirm."
+text = "Select up to 4 cards to discard, then click Draw."
 horizontal_alignment = 1
 
 [node name="ConfirmBtn" type="Button" parent="UI/DrawPanel"]
