@@ -1,6 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+*.uid
+export_presets.cfg
 
 # Web export output (regenerate with Project → Export)
 /web-export/*
