@@ -13,6 +13,8 @@ const PS_FOLDED      := 1
 const PS_ALL_IN      := 2
 const PS_SITTING_OUT := 3
 
+const TURN_TIMEOUT_SEC = 30.0
+
 var _table                   # GameTable ref — untyped for duck-typed RPC calls
 var _deck                    # Deck instance
 var _players: Array  = []    # Array of PlayerState
@@ -27,12 +29,22 @@ var _min_bet: int = 20
 var _round_bets: Array[int] = []
 var _has_acted: Array[bool]  = []
 
+## Turn timer
+var _turn_timer: Timer = null
+var _turn_start_usec: int = 0
+
 enum Phase { WAITING, ANTE, DEALING, BETTING, DRAW, SHOWDOWN, HAND_END }
 var _phase: Phase = Phase.WAITING
 
 func _init(table_node) -> void:
 	_table = table_node
 	_deck  = _Deck.new()
+
+func _ready() -> void:
+	_turn_timer = Timer.new()
+	_turn_timer.one_shot = true
+	_turn_timer.timeout.connect(_on_turn_timeout)
+	add_child(_turn_timer)
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
@@ -96,6 +108,8 @@ func _start_betting_round(first_to_act: int) -> void:
 	_find_next_actor()
 
 func _execute_action(seat: int, action: String, amount: int) -> void:
+	_turn_timer.stop()
+	_turn_start_usec = 0
 	var p = _players[seat]
 	match action:
 		"fold":
@@ -160,6 +174,8 @@ func _find_next_actor() -> void:
 		var p = _players[s]
 		if p.status == PS_ACTIVE and not _has_acted[s]:
 			_current_actor = s
+			_turn_start_usec = Time.get_ticks_usec()
+			_turn_timer.start(TURN_TIMEOUT_SEC)
 			_broadcast_state()
 			_notify_actor(s)
 			return
@@ -285,6 +301,15 @@ func _notify_actor(seat: int) -> void:
 	else:
 		_table.receive_your_turn.rpc_id(p.peer_id, actions, _current_bet, _min_bet, p.chips)
 
+func _on_turn_timeout() -> void:
+	if _current_actor < 0 or _current_actor >= _players.size():
+		return
+	var owed: int = _current_bet - _round_bets[_current_actor]
+	if owed == 0:
+		_execute_action(_current_actor, "check", 0)
+	else:
+		_execute_action(_current_actor, "fold", 0)
+
 func _valid_actions_for(p, seat: int) -> Array:
 	var actions: Array = ["fold"]
 	var owed := _current_bet - _round_bets[seat]
@@ -303,6 +328,8 @@ func _build_public_state() -> Dictionary:
 		d["round_bet"]  = _round_bets[i] if _round_bets.size() > i else 0
 		d["is_dealer"]  = (i == _dealer_index)
 		player_dicts.append(d)
+	var elapsed_sec: float = (Time.get_ticks_usec() - _turn_start_usec) / 1_000_000.0 if _turn_start_usec > 0 else TURN_TIMEOUT_SEC
+	var time_left: float = maxf(TURN_TIMEOUT_SEC - elapsed_sec, 0.0) if _current_actor >= 0 else 0.0
 	return {
 		"phase":           int(_phase),
 		"pot":             _pot,
@@ -312,6 +339,8 @@ func _build_public_state() -> Dictionary:
 		"community_cards": _get_community_cards(),
 		"last_action":     _last_action_text,
 		"players":         player_dicts,
+		"turn_time_left":  time_left,
+		"turn_duration":   TURN_TIMEOUT_SEC,
 	}
 
 func _get_community_cards() -> Array:

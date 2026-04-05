@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/game_table.gd" id="1"]
+[ext_resource type="Script" path="res://ui/clock_timer.gd" id="2"]
 
 [node name="GameTable" type="Node2D"]
 script = ExtResource("1")
@@ -27,6 +28,14 @@ offset_top = 330.0
 offset_right = 890.0
 offset_bottom = 445.0
 alignment = 1
+visible = false
+
+[node name="TurnTimer" type="Control" parent="UI"]
+script = ExtResource("2")
+offset_left = 1080.0
+offset_top = 15.0
+offset_right = 1180.0
+offset_bottom = 115.0
 visible = false
 
 [node name="ActionLog" type="RichTextLabel" parent="UI"]

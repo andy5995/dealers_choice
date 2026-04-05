@@ -40,6 +40,10 @@ var _last_coin_action: String = ""
 @onready var _results_overlay: Control       = $UI/ResultsOverlay
 @onready var _results_label:   Label         = $UI/ResultsOverlay/CenterBox/InnerVBox/ResultsLabel
 @onready var _next_btn:        Button        = $UI/ResultsOverlay/CenterBox/InnerVBox/NextBtn
+@onready var _clock_timer = $UI/TurnTimer
+
+var _client_time_left: float = 0.0
+var _turn_duration: float = 30.0
 
 func _ready() -> void:
 	_my_peer_id = NetworkManager.get_my_id()
@@ -59,6 +63,11 @@ func _ready() -> void:
 
 	if NetworkManager.is_server():
 		_create_game_logic()
+
+func _process(delta: float) -> void:
+	if _client_time_left > 0.0:
+		_client_time_left = maxf(_client_time_left - delta, 0.0)
+		_clock_timer.fill_ratio = _client_time_left / _turn_duration
 
 func _create_seats() -> void:
 	var my_index := _peer_order.find(_my_peer_id)
@@ -153,6 +162,16 @@ func _show_draw_controls(_hand: Array) -> void:
 
 func _apply_public_state(state: Dictionary) -> void:
 	_pot_label.text = "Pot: %d" % state.get("pot", 0)
+
+	var actor_idx: int = state.get("actor_index", -1)
+	if actor_idx >= 0:
+		_turn_duration = state.get("turn_duration", 30.0)
+		_client_time_left = state.get("turn_time_left", 0.0)
+		_clock_timer.fill_ratio = _client_time_left / _turn_duration
+		_clock_timer.visible = true
+	else:
+		_client_time_left = 0.0
+		_clock_timer.visible = false
 
 	var last_action: String = state.get("last_action", "")
 	if last_action != "" and last_action != _last_coin_action:
