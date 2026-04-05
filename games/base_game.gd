@@ -51,6 +51,10 @@ func _ready() -> void:
 func begin_game(player_list: Array) -> void:
 	_players = player_list
 	_dealer_index = 0
+	for i in range(_players.size()):
+		if _players[i].peer_id == GameManager.dealer_peer_id:
+			_dealer_index = i
+			break
 	await get_tree().create_timer(0.5).timeout
 	start_hand()
 
@@ -203,12 +207,19 @@ func _end_betting_round() -> void:
 # ── Pot and winner logic ──────────────────────────────────────────────────────
 
 func _award_last_standing() -> void:
-	for p in _players:
+	var reveal: Dictionary = {}
+	for i in range(_players.size()):
+		var p = _players[i]
 		if p.status != PS_FOLDED:
 			p.chips += _pot
 			_last_action_text = "%s wins %d" % [p.display_name, _pot]
 			_pot = 0
-			break
+			reveal[p.peer_id] = {"hand": [], "hand_name": "last standing", "is_winner": true}
+		else:
+			reveal[p.peer_id] = {"hand": [], "hand_name": "", "is_winner": false}
+	_broadcast_state()
+	_table.receive_game_over.rpc(reveal)
+	await get_tree().create_timer(15.0).timeout
 	_end_hand()
 
 func _do_showdown() -> void:
@@ -258,6 +269,8 @@ func _do_showdown() -> void:
 	]
 	_broadcast_state()
 	_table.receive_game_over.rpc(reveal)
+	await get_tree().create_timer(15.0).timeout
+	_end_hand()
 
 func _end_hand() -> void:
 	_phase = Phase.HAND_END
@@ -274,9 +287,9 @@ func _end_hand() -> void:
 		_table.receive_game_over.rpc({"final": true, "winner_name": winner_name})
 		return
 
-	_dealer_index = (_dealer_index + 1) % _players.size()
-	await get_tree().create_timer(3.0).timeout
-	start_hand()
+	GameManager.advance_dealer()
+	await get_tree().create_timer(0.5).timeout
+	_table.return_to_lobby.rpc()
 
 # ── Broadcasting ──────────────────────────────────────────────────────────────
 

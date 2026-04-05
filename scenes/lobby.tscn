@@ -20,16 +20,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="VBox" type="VBoxContainer" parent="Center"]
-custom_minimum_size = Vector2(400, 0)
+custom_minimum_size = Vector2(500, 0)
+theme_override_constants/separation = 12
 
 [node name="Title" type="Label" parent="Center/VBox"]
 text = "Lobby"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 28
-
-[node name="GameLabel" type="Label" parent="Center/VBox"]
-text = "Game: "
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
 
 [node name="StatusLabel" type="Label" parent="Center/VBox"]
 text = "0 / 5 players"
@@ -37,14 +34,42 @@ horizontal_alignment = 1
 modulate = Color(1, 0.8, 0.3, 1)
 
 [node name="PlayerList" type="ItemList" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 160)
+custom_minimum_size = Vector2(0, 200)
 
-[node name="StartBtn" type="Button" parent="Center/VBox"]
-text = "Start Game"
+[node name="DealerPanel" type="VBoxContainer" parent="Center/VBox"]
+visible = false
+theme_override_constants/separation = 8
+
+[node name="DealerLabel" type="Label" parent="Center/VBox/DealerPanel"]
+text = "You are the dealer — pick a game:"
+horizontal_alignment = 1
+
+[node name="BtnRow" type="HBoxContainer" parent="Center/VBox/DealerPanel"]
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="HoldemBtn" type="Button" parent="Center/VBox/DealerPanel/BtnRow"]
+text = "Texas Hold'em"
+custom_minimum_size = Vector2(140, 0)
+
+[node name="DrawBtn" type="Button" parent="Center/VBox/DealerPanel/BtnRow"]
+text = "5-Card Draw"
+custom_minimum_size = Vector2(140, 0)
+
+[node name="StudBtn" type="Button" parent="Center/VBox/DealerPanel/BtnRow"]
+text = "7-Card Stud"
+custom_minimum_size = Vector2(140, 0)
+
+[node name="WaitingLabel" type="Label" parent="Center/VBox"]
+text = "Waiting for players…"
+horizontal_alignment = 1
+modulate = Color(0.7, 0.7, 0.7, 1)
 visible = false
 
 [node name="BackBtn" type="Button" parent="Center/VBox"]
 text = "Leave Lobby"
 
-[connection signal="pressed" from="Center/VBox/StartBtn" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="Center/VBox/BackBtn"  to="." method="_on_back_pressed"]
+[connection signal="pressed" from="Center/VBox/DealerPanel/BtnRow/HoldemBtn" to="." method="_on_holdem_pressed"]
+[connection signal="pressed" from="Center/VBox/DealerPanel/BtnRow/DrawBtn"   to="." method="_on_draw_pressed"]
+[connection signal="pressed" from="Center/VBox/DealerPanel/BtnRow/StudBtn"   to="." method="_on_stud_pressed"]
+[connection signal="pressed" from="Center/VBox/BackBtn"                       to="." method="_on_back_pressed"]

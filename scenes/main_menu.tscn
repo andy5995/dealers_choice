@@ -20,73 +20,52 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="VBox" type="VBoxContainer" parent="Center"]
-custom_minimum_size = Vector2(400, 0)
+custom_minimum_size = Vector2(420, 0)
+theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="Center/VBox"]
 text = "That GD Poker Suite"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 36
 
-[node name="Spacer1" type="Control" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 16)
+[node name="Subtitle" type="Label" parent="Center/VBox"]
+text = "Texas Hold'em · 5-Card Draw · 7-Card Stud"
+horizontal_alignment = 1
+modulate = Color(0.75, 0.9, 0.75, 1)
+
+[node name="Spacer" type="Control" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 20)
 
 [node name="NameRow" type="HBoxContainer" parent="Center/VBox"]
+
 [node name="NameLabel" type="Label" parent="Center/VBox/NameRow"]
-text = "Your name: "
-custom_minimum_size = Vector2(120, 0)
+text = "Your name:"
+custom_minimum_size = Vector2(130, 0)
+vertical_alignment = 1
+
 [node name="NameInput" type="LineEdit" parent="Center/VBox/NameRow"]
 placeholder_text = "Enter name"
 size_flags_horizontal = 3
 
-[node name="VariantRow" type="HBoxContainer" parent="Center/VBox"]
-[node name="VariantLabel" type="Label" parent="Center/VBox/VariantRow"]
-text = "Game: "
-custom_minimum_size = Vector2(120, 0)
-[node name="VariantOption" type="OptionButton" parent="Center/VBox/VariantRow"]
+[node name="ServerRow" type="HBoxContainer" parent="Center/VBox"]
+
+[node name="ServerLabel" type="Label" parent="Center/VBox/ServerRow"]
+text = "Server address:"
+custom_minimum_size = Vector2(130, 0)
+vertical_alignment = 1
+
+[node name="IPInput" type="LineEdit" parent="Center/VBox/ServerRow"]
+placeholder_text = "IP address"
 size_flags_horizontal = 3
 
-[node name="ChipsRow" type="HBoxContainer" parent="Center/VBox"]
-[node name="ChipsLabel" type="Label" parent="Center/VBox/ChipsRow"]
-text = "Starting chips: "
-custom_minimum_size = Vector2(120, 0)
-[node name="ChipsSpin" type="SpinBox" parent="Center/VBox/ChipsRow"]
-min_value = 100
-max_value = 10000
-step = 100
-value = 1000
-size_flags_horizontal = 3
-
-[node name="AnteRow" type="HBoxContainer" parent="Center/VBox"]
-[node name="AnteLabel" type="Label" parent="Center/VBox/AnteRow"]
-text = "Ante: "
-custom_minimum_size = Vector2(120, 0)
-[node name="AnteSpin" type="SpinBox" parent="Center/VBox/AnteRow"]
-min_value = 5
-max_value = 500
-step = 5
-value = 10
-size_flags_horizontal = 3
-
-[node name="Spacer2" type="Control" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 16)
-
-[node name="HostBtn" type="Button" parent="Center/VBox"]
-text = "Host Game"
-
-[node name="Spacer3" type="Control" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 8)
-
-[node name="JoinRow" type="HBoxContainer" parent="Center/VBox"]
-[node name="IPInput" type="LineEdit" parent="Center/VBox/JoinRow"]
-placeholder_text = "Host IP address"
-size_flags_horizontal = 3
-[node name="JoinBtn" type="Button" parent="Center/VBox/JoinRow"]
-text = "Join"
+[node name="JoinBtn" type="Button" parent="Center/VBox"]
+text = "Join Game"
+theme_override_font_sizes/font_size = 20
 
 [node name="StatusLabel" type="Label" parent="Center/VBox"]
 text = ""
 horizontal_alignment = 1
 modulate = Color(1, 0.8, 0.3, 1)
+autowrap_mode = 3
 
-[connection signal="pressed" from="Center/VBox/HostBtn"       to="." method="_on_host_pressed"]
-[connection signal="pressed" from="Center/VBox/JoinRow/JoinBtn" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="Center/VBox/JoinBtn" to="." method="_on_join_pressed"]

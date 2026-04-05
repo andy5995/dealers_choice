@@ -181,6 +181,10 @@ func receive_game_over(results: Dictionary) -> void:
 	AudioManager.play_game_over()
 	_show_results(results)
 
+@rpc("authority", "call_local", "reliable")
+func return_to_lobby() -> void:
+	get_tree().change_scene_to_file("res://scenes/lobby.tscn")
+
 # ── Called directly by BaseGame for the host player ──────────────────────────
 
 func _apply_private_state(peer_id: int, state: Dictionary) -> void:
@@ -247,6 +251,8 @@ func _show_results(results: Dictionary) -> void:
 	if results.get("final", false):
 		_results_label.text = "%s wins the game!" % results.get("winner_name", "Nobody")
 		_next_btn.text = "Main Menu"
+		_next_btn.visible = true
+		_clock_timer.visible = false
 	else:
 		var lines: Array[String] = []
 		for pid in results:
@@ -256,7 +262,11 @@ func _show_results(results: Dictionary) -> void:
 				var pname: String = NetworkManager.player_names.get(pid, "Player")
 				lines.append("%s: %s%s" % [pname, info.get("hand_name", ""), suffix])
 		_results_label.text = "\n".join(lines)
-		_next_btn.text = "Next Hand"
+		_next_btn.visible = false
+		_turn_duration = 15.0
+		_client_time_left = 15.0
+		_clock_timer.fill_ratio = 1.0
+		_clock_timer.visible = true
 	_results_overlay.visible = true
 
 func _on_results_next_pressed() -> void:

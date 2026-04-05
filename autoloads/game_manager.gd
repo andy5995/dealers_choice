@@ -9,6 +9,34 @@ var starting_chips: int = 1000
 var ante_amount: int = 10
 var min_bet: int = 20
 
+var dealer_peer_id: int = 0
+signal dealer_changed(new_dealer_id: int)
+
+## Advance the dealer to the next player (server only). Broadcasts to all peers.
+func advance_dealer() -> void:
+	if not NetworkManager.is_server():
+		return
+	var peers: Array = NetworkManager.player_names.keys()
+	peers.sort()
+	if peers.is_empty():
+		return
+	if dealer_peer_id == 0 or not peers.has(dealer_peer_id):
+		dealer_peer_id = peers[0]
+	else:
+		var idx: int = peers.find(dealer_peer_id)
+		dealer_peer_id = peers[(idx + 1) % peers.size()]
+	_sync_dealer.rpc(dealer_peer_id)
+
+## Re-broadcast the current dealer to all peers (useful after scene changes).
+func broadcast_dealer() -> void:
+	if NetworkManager.is_server() and dealer_peer_id != 0:
+		_sync_dealer.rpc(dealer_peer_id)
+
+@rpc("authority", "call_local", "reliable")
+func _sync_dealer(peer_id: int) -> void:
+	dealer_peer_id = peer_id
+	dealer_changed.emit(dealer_peer_id)
+
 func start_game() -> void:
 	if not NetworkManager.is_server():
 		return

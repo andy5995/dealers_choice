@@ -34,6 +34,18 @@ func host(my_name: String) -> Error:
 	player_names[1] = my_name
 	return OK
 
+## Start a headless server — no player registered for peer_id 1.
+func host_server() -> Error:
+	peer = WebSocketMultiplayerPeer.new()
+	var err := peer.create_server(SERVER_PORT)
+	if err != OK:
+		peer = null
+		return err
+	multiplayer.multiplayer_peer = peer
+	multiplayer.peer_connected.connect(_on_peer_connected)
+	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	return OK
+
 func join(address: String, my_name: String) -> Error:
 	disconnect_all()  # clean up any previous attempt
 	peer = WebSocketMultiplayerPeer.new()
@@ -47,8 +59,8 @@ func join(address: String, my_name: String) -> Error:
 		peer = null
 		return err
 	multiplayer.multiplayer_peer = peer
-	multiplayer.connected_to_server.connect(_on_connected_to_server)
-	multiplayer.connection_failed.connect(_on_connection_failed)
+	multiplayer.connected_to_server.connect(_on_connected_to_server, CONNECT_ONE_SHOT)
+	multiplayer.connection_failed.connect(_on_connection_failed, CONNECT_ONE_SHOT)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	player_names[-1] = my_name  # stored temporarily until we get our ID
 	return OK
@@ -60,6 +72,8 @@ func is_server() -> bool:
 	return multiplayer.is_server()
 
 func disconnect_all() -> void:
+	if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+		multiplayer.server_disconnected.disconnect(_on_server_disconnected)
 	if peer != null:
 		multiplayer.multiplayer_peer = null
 		peer = null
