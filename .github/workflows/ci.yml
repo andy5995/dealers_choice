@@ -38,3 +38,6 @@ jobs:
 
       - name: Check GDScript for errors
         run: ./godot --headless --path . --check-only --quit
+
+      - name: Run GUT unit tests
+        run: ./godot --headless --path . -s res://addons/gut/gut_cmdln.gd -- -gconfig=res://.gutconfig.json
