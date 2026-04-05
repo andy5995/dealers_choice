@@ -1,6 +1,8 @@
 # That GD Poker Suite
 
-A web-capable multiplayer poker suite built with Godot 4.6. Supports up to 5 players across three variants: Texas Hold'em, 5-Card Draw, and 7-Card Stud. All games use antes only — no blinds.
+(wip, not playable yet) A web-capable multiplayer poker suite built with Godot
+4.6. Supports up to 5 players across three variants: Texas Hold'em, 5-Card
+Draw, and 7-Card Stud. All games use antes only — no blinds.
 
 ## Playing locally (same PC)
 
@@ -21,25 +23,45 @@ Friends play in their browser. You run the game natively as the server.
 
 ### One-time setup
 
-**1. Generate a TLS certificate** (self-signed — friends will see a one-time browser warning):
+**1. Configure the cert path** by copying the example env file and setting your platform's path:
 
 ```bash
-mkdir -p nginx/certs
+cp nginx/.env.example nginx/.env
+# then edit nginx/.env and set CERTS_PATH
+```
+
+**2. Generate a TLS certificate** (self-signed — friends will see a one-time
+browser warning):
+
+Linux / macOS:
+```bash
+mkdir -p ~/.local/share/that-gd-poker-suite/nginx/certs
 openssl req -x509 -newkey rsa:4096 \
-  -keyout nginx/certs/key.pem \
-  -out nginx/certs/cert.pem \
+  -keyout ~/.local/share/that-gd-poker-suite/nginx/certs/key.pem \
+  -out    ~/.local/share/that-gd-poker-suite/nginx/certs/cert.pem \
   -days 365 -nodes -subj '/CN=poker'
 ```
 
-**2. Export the web build** in the Godot editor:
+Windows (PowerShell — `openssl` is included with [Git for Windows](https://git-scm.com/)):
+```powershell
+New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\that-gd-poker-suite\nginx\certs"
+openssl req -x509 -newkey rsa:4096 `
+  -keyout "$env:LOCALAPPDATA\that-gd-poker-suite\nginx\certs\key.pem" `
+  -out    "$env:LOCALAPPDATA\that-gd-poker-suite\nginx\certs\cert.pem" `
+  -days 365 -nodes -subj '/CN=poker'
+```
+
+Set `CERTS_PATH` in `nginx/.env` to match whichever path you used above.
+
+**3. Export the web build** in the Godot editor:
 
 - Project → Export → Web
 - Export path: `web-export/index.html`
 
-**3. Start nginx:**
+**4. Start nginx:**
 
 ```bash
-docker compose up -d
+docker compose -f nginx/docker-compose.yml up -d
 ```
 
 ### Every session
@@ -52,14 +74,14 @@ docker compose up -d
 ### Stopping the server
 
 ```bash
-docker compose down
+docker compose -f nginx/docker-compose.yml down
 ```
 
 ### Re-deploying after a code change
 
 ```bash
 # In the Godot editor: Project → Export → Web (overwrite web-export/)
-docker compose restart   # picks up the new files immediately
+docker compose -f nginx/docker-compose.yml restart   # picks up the new files immediately
 ```
 
 ## Project structure
@@ -71,9 +93,8 @@ games/           BaseGame, FiveCardDraw, TexasHoldem, SevenCardStud
 ui/              CardView, PlayerSeat, BettingControls
 scenes/          main_menu, lobby, game_table
 assets/suits/    SVG suit symbols (heart, diamond, spade, club)
-nginx/           nginx reverse-proxy config + TLS certs (certs/ not in git)
+nginx/           nginx reverse-proxy config and docker-compose.yml
 web-export/      Godot HTML5 export output (not in git)
-docker-compose.yml
 ```
 
 ## Architecture notes
