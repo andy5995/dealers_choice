@@ -24,9 +24,9 @@ const _PlayerState    := preload("res://core/player_state.gd")
 const SEAT_POSITIONS := [
 	Vector2(110, 365),   # 0: local — upper-left, lower   (top-left ≈ 30, 290)
 	Vector2(110, 105),   # 1: upper-left, above local      (top-left ≈ 30, 30)
-	Vector2(1730, 105),  # 2: upper-right (opposite p1)    (top-left ≈ 1650, 30)
-	Vector2(1730, 365),  # 3: right middle                 (top-left ≈ 1650, 290)
-	Vector2(1730, 625),  # 4: right lower                  (top-left ≈ 1650, 550)
+	Vector2(1090, 105),  # 2: right col top    (top-left ≈ 1010, 30)  = w/2+50
+	Vector2(1090, 365),  # 3: right col middle (top-left ≈ 1010, 290)
+	Vector2(1090, 625),  # 4: right col lower  (top-left ≈ 1010, 550)
 ]
 
 ## Coin image paths — loaded at runtime so missing .import files don't block parse.
