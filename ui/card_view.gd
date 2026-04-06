@@ -26,7 +26,7 @@ const _SUIT_TEX = {
 }
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(120, 84)
+	custom_minimum_size = Vector2(96, 84)
 
 func show_card(name: String, face_up: bool = true) -> void:
 	card_name = name

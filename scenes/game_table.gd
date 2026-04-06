@@ -16,14 +16,17 @@ const _TexasHoldem    := preload("res://games/texas_holdem.gd")
 const _SevenCardStud  := preload("res://games/seven_card_stud.gd")
 const _PlayerState    := preload("res://core/player_state.gd")
 
-## Seat display positions for up to 5 players (1280×720 table).
-## Index 0 = local player (always bottom-centre); others clockwise from left.
+## Seat display positions for up to 5 players (1920×1080 table).
+## Index 0 = local player (upper-left lower slot).
+## Index 1 = directly above local player (upper-left upper slot).
+## Indices 2-4 = right column top→bottom (index 2 opposite index 1).
+## seat.position = SEAT_POSITIONS[display_pos] - Vector2(80, 75) → top-left of 240×225 seat.
 const SEAT_POSITIONS := [
-	Vector2(960, 885),
-	Vector2(240, 690),
-	Vector2(240, 270),
-	Vector2(1680, 270),
-	Vector2(1680, 690),
+	Vector2(110, 365),   # 0: local — upper-left, lower   (top-left ≈ 30, 290)
+	Vector2(110, 105),   # 1: upper-left, above local      (top-left ≈ 30, 30)
+	Vector2(1730, 105),  # 2: upper-right (opposite p1)    (top-left ≈ 1650, 30)
+	Vector2(1730, 365),  # 3: right middle                 (top-left ≈ 1650, 290)
+	Vector2(1730, 625),  # 4: right lower                  (top-left ≈ 1650, 550)
 ]
 
 ## Coin image paths — loaded at runtime so missing .import files don't block parse.
