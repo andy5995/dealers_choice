@@ -10,8 +10,8 @@ func _start_hand_impl() -> void:
 	_street = 3
 	for p in _players:
 		p.face_down_cards = _deck.draw_n(2)
-		p.face_up_cards   = [_deck.draw()]
-		p.hand            = p.face_down_cards + p.face_up_cards
+		p.face_up_cards   = _deck.draw_n(1)
+		p.hand.assign(p.face_down_cards + p.face_up_cards)
 	_phase = Phase.BETTING
 	_broadcast_state()
 	# Third street: player with lowest up-card brings in first

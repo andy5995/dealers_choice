@@ -100,7 +100,7 @@ func _show_stud_private(hand: Array, face_down: Array) -> void:
 	_set_card_count(hand.size())
 	for i in face_down.size():
 		if i < _card_views.size():
-			_card_views[i].show_card(face_down[i], false)
+			_card_views[i].show_card(face_down[i], true)   # local player sees own hole cards
 	for i in range(face_down.size(), hand.size()):
 		_card_views[i].show_card(hand[i], true)
 
