@@ -140,26 +140,35 @@ func _execute_action(seat: int, action: String, amount: int) -> void:
 			_has_acted[seat] = true
 
 		"bet", "raise":
-			var new_total := mini(amount, p.chips + _round_bets[seat])
-			if new_total < _current_bet:
+			# DC model: raise = call (pay owed) then bet the increment.
+			# For bet (no prior bet, owed == 0) this is just the bet size.
+			# amount = raise/bet INCREMENT, not a raise-to total.
+			if action == "raise":
+				var owed: int = _current_bet - _round_bets[seat]
+				var call_chips: int = mini(owed, p.chips)
+				p.chips -= call_chips
+				p.total_pot_contrib += call_chips
+				_round_bets[seat] += call_chips
+				_pot += call_chips
+
+			var bet_chips: int = mini(amount, p.chips)
+			if bet_chips == 0:
 				return
-			var additional := new_total - _round_bets[seat]
-			p.chips -= additional
-			p.total_pot_contrib += additional
-			_round_bets[seat] = new_total
-			_pot += additional
-			if new_total > _current_bet:
-				_min_bet = maxi(new_total - _current_bet, GameManager.min_bet)
-			_current_bet = new_total
+			p.chips -= bet_chips
+			p.total_pot_contrib += bet_chips
+			_round_bets[seat] += bet_chips
+			_pot += bet_chips
+			_min_bet = maxi(bet_chips, GameManager.min_bet)
+			_current_bet = _round_bets[seat]
 			if p.chips == 0:
 				p.status = PS_ALL_IN
 			for i in range(_players.size()):
 				if i != seat and _players[i].status == PS_ACTIVE:
 					_has_acted[i] = false
-			_last_action_text = "%s %ss to %d" % [
+			_last_action_text = "%s %ss %d" % [
 				p.display_name,
 				"bet" if action == "bet" else "raise",
-				new_total
+				bet_chips,
 			]
 			_has_acted[seat] = true
 

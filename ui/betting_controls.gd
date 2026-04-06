@@ -46,9 +46,8 @@ func setup(valid_actions: Array, bet_to_call: int, min_bet: int, my_chips: int) 
 	else:
 		_call_check_btn.text = "Call %d" % mini(bet_to_call, my_chips)
 
-	# Minimum valid total for a bet/raise.
-	# An amount is valid as long as it is >= the current bet (equal is allowed).
-	_min_valid = bet_to_call
+	# Minimum raise/bet INCREMENT (DC model: amount = increment, not raise-to total).
+	_min_valid = min_bet
 
 	var show_amounts := _has_bet_action or _has_raise_action
 	_amount_row.visible = show_amounts
@@ -60,7 +59,7 @@ func _refresh_amounts() -> void:
 	for i in AMOUNTS.size():
 		var amt: int    = AMOUNTS[i]
 		var btn: Button = _amt_btns[i]
-		btn.disabled = amt < _min_valid or amt > _my_chips
+		btn.disabled = amt < _min_valid or amt > (_my_chips - _bet_to_call)
 	# If the stored selection is now disabled, advance to the first valid one.
 	if _selected_idx < _amt_btns.size() and _amt_btns[_selected_idx].disabled:
 		_selected_idx = 0
@@ -99,7 +98,7 @@ func _on_amount_pressed(idx: int) -> void:
 
 func _selected_amount() -> int:
 	if _selected_idx < AMOUNTS.size():
-		return clampi(AMOUNTS[_selected_idx], _min_valid, _my_chips)
+		return clampi(AMOUNTS[_selected_idx], _min_valid, _my_chips - _bet_to_call)
 	return _min_valid
 
 func _emit(action: String, amount: int) -> void:
