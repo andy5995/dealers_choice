@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://ui/player_seat.gd" id="1"]
+[ext_resource type="FontFile" path="res://assets/fonts/LiberationSans-Bold.ttf" id="2"]
 
 [node name="PlayerSeat" type="Control"]
 script = ExtResource("1")
@@ -22,19 +23,27 @@ offset_bottom = -4.0
 [node name="NameLabel" type="Label" parent="VBox"]
 text = "Player"
 horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 22
 
 [node name="ChipsLabel" type="Label" parent="VBox"]
 text = "$ 1000"
 horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 20
 
 [node name="BetLabel" type="Label" parent="VBox"]
 text = ""
 horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 18
 
 [node name="StatusLabel" type="Label" parent="VBox"]
 text = ""
 horizontal_alignment = 1
 modulate = Color(1, 0.3, 0.3, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 18
 
 [node name="CardsBox" type="HBoxContainer" parent="VBox"]
 alignment = 1
@@ -46,4 +55,6 @@ offset_left = -20.0
 offset_top = -20.0
 text = "D"
 modulate = Color(1, 0.8, 0, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 20
 visible = false

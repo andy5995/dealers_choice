@@ -1,9 +1,9 @@
 extends Control
 
-@onready var _player_list:   ItemList      = $Center/VBox/PlayerList
-@onready var _status_label:  Label         = $Center/VBox/StatusLabel
-@onready var _dealer_panel:  VBoxContainer = $Center/VBox/DealerPanel
-@onready var _waiting_label: Label         = $Center/VBox/WaitingLabel
+@onready var _player_list:   ItemList      = $PlayerList
+@onready var _status_label:  Label         = $StatusLabel
+@onready var _dealer_panel:  VBoxContainer = $DealerPanel
+@onready var _waiting_label: Label         = $WaitingLabel
 
 func _ready() -> void:
 	NetworkManager.lobby_updated.connect(_refresh)
@@ -33,7 +33,7 @@ func _refresh(_ignored: int = 0) -> void:
 	_dealer_panel.visible = i_am_dealer
 	# Disable variant buttons until at least 2 players are present.
 	var can_start := player_count >= 2
-	for btn in $Center/VBox/DealerPanel/BtnRow.get_children():
+	for btn in $DealerPanel/BtnRow.get_children():
 		(btn as Button).disabled = not can_start
 	_waiting_label.visible = not i_am_dealer
 	if not i_am_dealer:

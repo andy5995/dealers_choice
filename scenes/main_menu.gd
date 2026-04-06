@@ -1,8 +1,8 @@
 extends Control
 
-@onready var _name_input:   LineEdit = $Center/VBox/NameRow/NameInput
-@onready var _ip_input:     LineEdit = $Center/VBox/ServerRow/IPInput
-@onready var _status_label: Label    = $Center/VBox/StatusLabel
+@onready var _name_input:   LineEdit = $Form/NameRow/NameInput
+@onready var _ip_input:     LineEdit = $Form/ServerRow/IPInput
+@onready var _status_label: Label    = $Form/StatusLabel
 
 func _ready() -> void:
 	if DisplayServer.get_name() == "headless":
