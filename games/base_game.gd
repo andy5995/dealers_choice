@@ -140,7 +140,7 @@ func _execute_action(seat: int, action: String, amount: int) -> void:
 
 		"bet", "raise":
 			var new_total := mini(amount, p.chips + _round_bets[seat])
-			if new_total <= _current_bet:
+			if new_total < _current_bet:
 				return
 			var additional := new_total - _round_bets[seat]
 			p.chips -= additional
