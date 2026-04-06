@@ -45,6 +45,7 @@ func _ready() -> void:
 	_turn_timer.one_shot = true
 	_turn_timer.timeout.connect(_on_turn_timeout)
 	add_child(_turn_timer)
+	NetworkManager.player_disconnected.connect(_on_peer_disconnected)
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
@@ -298,11 +299,12 @@ func _broadcast_state() -> void:
 	_table.receive_public_state.rpc(public_state)
 
 	var my_id := multiplayer.get_unique_id()
+	var connected := multiplayer.get_peers()
 	for p in _players:
 		var priv = p.to_private_dict()
 		if p.peer_id == my_id:
 			_table._apply_private_state(p.peer_id, priv)
-		else:
+		elif connected.has(p.peer_id):
 			_table.receive_private_state.rpc_id(p.peer_id, priv)
 
 func _notify_actor(seat: int) -> void:
@@ -311,8 +313,21 @@ func _notify_actor(seat: int) -> void:
 	var my_id := multiplayer.get_unique_id()
 	if p.peer_id == my_id:
 		_table._show_betting_controls(actions, _current_bet, _min_bet, p.chips)
-	else:
+	elif multiplayer.get_peers().has(p.peer_id):
 		_table.receive_your_turn.rpc_id(p.peer_id, actions, _current_bet, _min_bet, p.chips)
+
+func _on_peer_disconnected(peer_id: int) -> void:
+	var seat := _seat_of(peer_id)
+	if seat < 0:
+		return
+	# Force-fold the disconnected player.
+	_players[seat].status = PS_FOLDED
+	_last_action_text = "%s disconnected" % _players[seat].display_name
+	if seat == _current_actor:
+		# It's their turn — drive the action forward.
+		_turn_timer.stop()
+		_current_actor = (seat + 1) % _players.size()
+		_find_next_actor()
 
 func _on_turn_timeout() -> void:
 	if _current_actor < 0 or _current_actor >= _players.size():
