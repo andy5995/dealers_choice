@@ -40,6 +40,15 @@ ArchaiOptix, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via
 [Classical Numismatic Group Inc.](http://www.cngcoins.com), [CC BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5), via Wikimedia Commons
 
 
+## Fonts
+
+* LiberationSans-Bold.ttf
+* LiberationSans-Regular.ttf
+* LiberationSerif-BoldItalic.ttf
+
+[Liberation Fonts](https://github.com/liberationfonts/liberation-fonts) by Red Hat, Inc. and contributors.
+Licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL).
+
 ## Sounds
 
 Coin sounds adapted from:
