@@ -270,7 +270,7 @@ func _show_results(results: Dictionary) -> void:
 		for pid in results:
 			if pid is int:
 				var info: Dictionary = results[pid]
-				var suffix := " ★" if info.get("is_winner", false) else ""
+				var suffix := " *" if info.get("is_winner", false) else ""
 				var pname: String = NetworkManager.player_names.get(pid, "Player")
 				lines.append("%s: %s%s" % [pname, info.get("hand_name", ""), suffix])
 		_results_label.text = "\n".join(lines)
