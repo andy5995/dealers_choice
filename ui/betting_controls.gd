@@ -41,7 +41,7 @@ func setup(valid_actions: Array, bet_to_call: int, min_bet: int, my_chips: int) 
 	_bet_btn.visible        = _has_bet_action
 	_raise_btn.visible      = _has_raise_action
 
-	if valid_actions.has("check"):
+	if bet_to_call == 0:
 		_call_check_btn.text = "Check"
 	else:
 		_call_check_btn.text = "Call %d" % mini(bet_to_call, my_chips)

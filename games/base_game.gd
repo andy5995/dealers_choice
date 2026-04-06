@@ -310,11 +310,12 @@ func _broadcast_state() -> void:
 func _notify_actor(seat: int) -> void:
 	var p = _players[seat]
 	var actions = _valid_actions_for(p, seat)
+	var owed := _current_bet - _round_bets[seat]
 	var my_id := multiplayer.get_unique_id()
 	if p.peer_id == my_id:
-		_table._show_betting_controls(actions, _current_bet, _min_bet, p.chips)
+		_table._show_betting_controls(actions, owed, _min_bet, p.chips)
 	elif multiplayer.get_peers().has(p.peer_id):
-		_table.receive_your_turn.rpc_id(p.peer_id, actions, _current_bet, _min_bet, p.chips)
+		_table.receive_your_turn.rpc_id(p.peer_id, actions, owed, _min_bet, p.chips)
 
 func _on_peer_disconnected(peer_id: int) -> void:
 	var seat := _seat_of(peer_id)
