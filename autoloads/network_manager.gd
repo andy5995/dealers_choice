@@ -10,8 +10,8 @@ signal connected_to_server()
 signal server_disconnected()
 signal lobby_updated()  ## fired on ALL peers whenever the player list changes
 
-const PORT         := 22777  ## public-facing port (nginx)
-const SERVER_PORT  := 22778  ## internal Godot WebSocket server port (not forwarded)
+const PORT         := 22888  ## public-facing port (nginx)
+const SERVER_PORT  := 22889  ## internal Godot WebSocket server port (not forwarded)
 const MAX_PLAYERS  := 5
 
 var peer: WebSocketMultiplayerPeer = null

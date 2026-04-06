@@ -18,7 +18,7 @@ Friends play in their browser. You run the game natively as the server.
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/engine/install/) with the Compose plugin
-- Port **22777** forwarded on your router to this machine
+- Port **22888** forwarded on your router to this machine
 - Godot 4.6.1 with the **Web export template** installed
 
 ### One-time setup
@@ -68,7 +68,7 @@ docker compose -f nginx/docker-compose.yml up -d
 
 1. Run `godot --path .`, enter your name, configure the game, click **Host**
 2. Share your public IP with friends
-3. Friends open `https://[your-public-ip]:22777` in their browser
+3. Friends open `https://[your-public-ip]:22888` in their browser
 4. They click **Advanced → Accept the Risk**, enter your IP, click **Join**
 
 ### Stopping the server
@@ -100,5 +100,5 @@ web-export/      Godot HTML5 export output (not in git)
 ## Architecture notes
 
 - **Host-as-server**: the player who clicks Host is peer_id 1 and runs all game logic server-side. Clients receive state via RPCs.
-- **Single port**: nginx on `:22777` serves the web build over HTTPS and proxies WebSocket (`/ws`) to the Godot server on `localhost:22778`.
+- **Single port**: nginx on `:22888` serves the web build over HTTPS and proxies WebSocket (`/ws`) to the Godot server on `localhost:22889`.
 - **Antes only**: all variants collect an ante before each hand. No big blind / small blind.
