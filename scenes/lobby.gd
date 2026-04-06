@@ -22,7 +22,7 @@ func _refresh(_ignored: int = 0) -> void:
 	var my_id := NetworkManager.get_my_id()
 	for pid in NetworkManager.player_names:
 		var pname: String = NetworkManager.player_names[pid]
-		var star := " ★" if pid == GameManager.dealer_peer_id else ""
+		var star := " *" if pid == GameManager.dealer_peer_id else ""
 		_player_list.add_item(pname + star)
 	_status_label.text = "%d / %d players" % [
 		NetworkManager.player_names.size(), NetworkManager.MAX_PLAYERS
