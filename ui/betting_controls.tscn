@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://ui/betting_controls.gd" id="1"]
 [ext_resource type="FontFile" path="res://assets/fonts/LiberationSans-Bold.ttf" id="2"]
@@ -40,12 +40,72 @@ content_margin_right = 12.0
 content_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxFlat" id="4"]
-bg_color = Color(0.12, 0.12, 0.12, 1)
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65, 0.16, 0.16, 1)
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="5"]
+bg_color = Color(0.95, 0.95, 0.95, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.85, 0.25, 0.25, 1)
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="6"]
+bg_color = Color(0.65, 0.16, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="7"]
+bg_color = Color(0.55, 0.12, 0.12, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="8"]
+bg_color = Color(0.18, 0.18, 0.18, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.22, 0.22, 0.22, 1)
+border_color = Color(0.28, 0.28, 0.28, 1)
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="9"]
+bg_color = Color(0.75, 0.75, 0.75, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.6, 0.6, 1)
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -59,78 +119,121 @@ visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme_override_constants/separation = 10
 
-[node name="Row1" type="HBoxContainer" parent="VBox"]
-alignment = 1
-theme_override_constants/separation = 20
-
-[node name="FoldBtn" type="Button" parent="VBox/Row1"]
-text = "Fold"
-custom_minimum_size = Vector2(150, 55)
-theme_override_styles/normal = SubResource("1")
-theme_override_styles/hover = SubResource("2")
-theme_override_styles/pressed = SubResource("3")
-theme_override_styles/disabled = SubResource("4")
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
-theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 26
-
-[node name="CallCheckBtn" type="Button" parent="VBox/Row1"]
-text = "Check"
-custom_minimum_size = Vector2(180, 55)
-theme_override_styles/normal = SubResource("1")
-theme_override_styles/hover = SubResource("2")
-theme_override_styles/pressed = SubResource("3")
-theme_override_styles/disabled = SubResource("4")
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
-theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 26
-
-[node name="RaiseBtn" type="Button" parent="VBox/Row1"]
-text = "Bet / Raise"
-custom_minimum_size = Vector2(180, 55)
-theme_override_styles/normal = SubResource("1")
-theme_override_styles/hover = SubResource("2")
-theme_override_styles/pressed = SubResource("3")
-theme_override_styles/disabled = SubResource("4")
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
-theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 26
-
-[node name="RaiseRow" type="HBoxContainer" parent="VBox"]
-visible = false
-alignment = 1
+[node name="ActionRow" type="HBoxContainer" parent="VBox"]
 theme_override_constants/separation = 14
 
-[node name="RaiseSlider" type="HSlider" parent="VBox/RaiseRow"]
-custom_minimum_size = Vector2(280, 0)
-
-[node name="RaiseLabel" type="Label" parent="VBox/RaiseRow"]
-text = "Raise to: 0"
-theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-
-[node name="ConfirmRaiseBtn" type="Button" parent="VBox/RaiseRow"]
-text = "Confirm"
-custom_minimum_size = Vector2(150, 50)
+[node name="FoldBtn" type="Button" parent="VBox/ActionRow"]
+text = "Fold"
+custom_minimum_size = Vector2(130, 55)
 theme_override_styles/normal = SubResource("1")
 theme_override_styles/hover = SubResource("2")
 theme_override_styles/pressed = SubResource("3")
+theme_override_styles/disabled = SubResource("8")
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
+theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.45, 0.45, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 26
+
+[node name="CallCheckBtn" type="Button" parent="VBox/ActionRow"]
+text = "Check"
+custom_minimum_size = Vector2(170, 55)
+theme_override_styles/normal = SubResource("1")
+theme_override_styles/hover = SubResource("2")
+theme_override_styles/pressed = SubResource("3")
+theme_override_styles/disabled = SubResource("8")
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
+theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.45, 0.45, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 26
+
+[node name="BetBtn" type="Button" parent="VBox/ActionRow"]
+text = "Bet"
+custom_minimum_size = Vector2(130, 55)
+theme_override_styles/normal = SubResource("1")
+theme_override_styles/hover = SubResource("2")
+theme_override_styles/pressed = SubResource("3")
+theme_override_styles/disabled = SubResource("8")
 theme_override_colors/font_color = Color(1, 1, 0, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
 theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 26
 
-[connection signal="pressed" from="VBox/Row1/FoldBtn"        to="." method="_on_fold_pressed"]
-[connection signal="pressed" from="VBox/Row1/CallCheckBtn"   to="." method="_on_call_check_pressed"]
-[connection signal="pressed" from="VBox/Row1/RaiseBtn"       to="." method="_on_raise_btn_pressed"]
-[connection signal="value_changed" from="VBox/RaiseRow/RaiseSlider" to="." method="_on_raise_slider_changed"]
-[connection signal="pressed" from="VBox/RaiseRow/ConfirmRaiseBtn"   to="." method="_on_confirm_raise_pressed"]
+[node name="RaiseBtn" type="Button" parent="VBox/ActionRow"]
+text = "Raise"
+custom_minimum_size = Vector2(130, 55)
+theme_override_styles/normal = SubResource("1")
+theme_override_styles/hover = SubResource("2")
+theme_override_styles/pressed = SubResource("3")
+theme_override_styles/disabled = SubResource("8")
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
+theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 26
+
+[node name="AmountRow" type="HBoxContainer" parent="VBox"]
+theme_override_constants/separation = 14
+visible = false
+
+[node name="Amt100Btn" type="Button" parent="VBox/AmountRow"]
+text = "100"
+toggle_mode = true
+custom_minimum_size = Vector2(130, 50)
+theme_override_styles/normal = SubResource("4")
+theme_override_styles/hover = SubResource("5")
+theme_override_styles/pressed = SubResource("6")
+theme_override_styles/hover_pressed = SubResource("7")
+theme_override_styles/disabled = SubResource("9")
+theme_override_colors/font_color = Color(0.65, 0.16, 0.16, 1)
+theme_override_colors/font_hover_color = Color(0.65, 0.16, 0.16, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 26
+
+[node name="Amt250Btn" type="Button" parent="VBox/AmountRow"]
+text = "250"
+toggle_mode = true
+custom_minimum_size = Vector2(130, 50)
+theme_override_styles/normal = SubResource("4")
+theme_override_styles/hover = SubResource("5")
+theme_override_styles/pressed = SubResource("6")
+theme_override_styles/hover_pressed = SubResource("7")
+theme_override_styles/disabled = SubResource("9")
+theme_override_colors/font_color = Color(0.65, 0.16, 0.16, 1)
+theme_override_colors/font_hover_color = Color(0.65, 0.16, 0.16, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 26
+
+[node name="Amt500Btn" type="Button" parent="VBox/AmountRow"]
+text = "500"
+toggle_mode = true
+custom_minimum_size = Vector2(130, 50)
+theme_override_styles/normal = SubResource("4")
+theme_override_styles/hover = SubResource("5")
+theme_override_styles/pressed = SubResource("6")
+theme_override_styles/hover_pressed = SubResource("7")
+theme_override_styles/disabled = SubResource("9")
+theme_override_colors/font_color = Color(0.65, 0.16, 0.16, 1)
+theme_override_colors/font_hover_color = Color(0.65, 0.16, 0.16, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 26
+
+[connection signal="pressed" from="VBox/ActionRow/FoldBtn"      to="." method="_on_fold_pressed"]
+[connection signal="pressed" from="VBox/ActionRow/CallCheckBtn" to="." method="_on_call_check_pressed"]
+[connection signal="pressed" from="VBox/ActionRow/BetBtn"       to="." method="_on_bet_pressed"]
+[connection signal="pressed" from="VBox/ActionRow/RaiseBtn"     to="." method="_on_raise_pressed"]
+[connection signal="pressed" from="VBox/AmountRow/Amt100Btn"    to="." method="_on_amount_pressed" binds=[0]]
+[connection signal="pressed" from="VBox/AmountRow/Amt250Btn"    to="." method="_on_amount_pressed" binds=[1]]
+[connection signal="pressed" from="VBox/AmountRow/Amt500Btn"    to="." method="_on_amount_pressed" binds=[2]]

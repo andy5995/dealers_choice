@@ -99,7 +99,15 @@ func _ready() -> void:
 
 	_betting_ctrl = BETTING_SCENE.instantiate()
 	$UI.add_child(_betting_ctrl)
-	_betting_ctrl.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	# Position at lower-left starting at ~1/3 screen width, auto-sized by content.
+	_betting_ctrl.anchor_left   = 0.0
+	_betting_ctrl.anchor_right  = 0.0
+	_betting_ctrl.anchor_top    = 1.0
+	_betting_ctrl.anchor_bottom = 1.0
+	_betting_ctrl.offset_left   = 640
+	_betting_ctrl.offset_top    = -145
+	_betting_ctrl.offset_right  = 1380
+	_betting_ctrl.offset_bottom = -20
 	_betting_ctrl.action_chosen.connect(_on_action_chosen)
 
 	if NetworkManager.is_server():
