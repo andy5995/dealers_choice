@@ -47,9 +47,8 @@ func setup(valid_actions: Array, bet_to_call: int, min_bet: int, my_chips: int) 
 		_call_check_btn.text = "Call %d" % mini(bet_to_call, my_chips)
 
 	# Minimum valid total for a bet/raise.
-	# For a bet (no prior bet): minimum is min_bet.
-	# For a raise: must be at least bet_to_call + min_bet (raise BY at least min_bet).
-	_min_valid = bet_to_call + min_bet
+	# An amount is valid as long as it is >= the current bet (equal is allowed).
+	_min_valid = bet_to_call
 
 	var show_amounts := _has_bet_action or _has_raise_action
 	_amount_row.visible = show_amounts
