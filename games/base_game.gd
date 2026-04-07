@@ -248,7 +248,7 @@ func _do_showdown() -> void:
 	var hand_values: Dictionary = {}
 
 	for seat in contenders:
-		var value: Array = _HandEval.best_from_n(_players[seat].hand)
+		var value: Array = _evaluate_hand(_players[seat].hand)
 		hand_values[seat] = value
 		var cmp: int = 0 if best_value.is_empty() else _HandEval.compare(value, best_value)
 		if best_value.is_empty() or cmp > 0:
@@ -380,6 +380,9 @@ func _build_public_state() -> Dictionary:
 		"turn_time_left":  time_left,
 		"turn_duration":   TURN_TIMEOUT_SEC,
 	}
+
+func _evaluate_hand(cards: Array) -> Array:
+	return _HandEval.best_from_n(cards)
 
 func _get_community_cards() -> Array:
 	return []

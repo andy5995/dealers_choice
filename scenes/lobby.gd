@@ -4,6 +4,8 @@ extends Control
 @onready var _status_label:  Label         = $StatusLabel
 @onready var _dealer_panel:  VBoxContainer = $DealerPanel
 @onready var _waiting_label: Label         = $WaitingLabel
+@onready var _holdem_btn:    Button        = $DealerPanel/BtnRow/HoldemBtn
+@onready var _deuces_btn:    Button        = $DealerPanel/BtnRow/DeucesBtn
 
 func _ready() -> void:
 	NetworkManager.lobby_updated.connect(_refresh)
@@ -33,8 +35,11 @@ func _refresh(_ignored: int = 0) -> void:
 	_dealer_panel.visible = i_am_dealer
 	# Disable variant buttons until at least 2 players are present.
 	var can_start := player_count >= 2
+	var dw_on := _deuces_btn.button_pressed
 	for btn in $DealerPanel/BtnRow.get_children():
 		(btn as Button).disabled = not can_start
+	if can_start:
+		_holdem_btn.disabled = dw_on
 	_waiting_label.visible = not i_am_dealer
 	if not i_am_dealer:
 		if GameManager.dealer_peer_id == 0:
@@ -86,22 +91,27 @@ func _on_draw_pressed() -> void:
 func _on_stud_pressed() -> void:
 	_submit_variant(GameManager.GameVariant.SEVEN_CARD_STUD)
 
+func _on_deuces_pressed() -> void:
+	_refresh()  # toggled — re-evaluate which buttons are enabled
+
 func _submit_variant(variant: int) -> void:
+	var dw := _deuces_btn.button_pressed
 	if NetworkManager.is_server():
-		_start_game_server_side(variant)
+		_start_game_server_side(variant, dw)
 	else:
-		submit_variant.rpc_id(1, variant)
+		submit_variant.rpc_id(1, variant, dw)
 
 @rpc("any_peer", "call_remote", "reliable")
-func submit_variant(variant: int) -> void:
+func submit_variant(variant: int, dw: bool) -> void:
 	if not NetworkManager.is_server():
 		return
 	var sender := multiplayer.get_remote_sender_id()
 	if sender != GameManager.dealer_peer_id:
 		return
-	_start_game_server_side(variant)
+	_start_game_server_side(variant, dw)
 
-func _start_game_server_side(variant: int) -> void:
+func _start_game_server_side(variant: int, dw: bool) -> void:
+	GameManager.deuces_wild = dw
 	GameManager.current_variant = variant as GameManager.GameVariant
 	GameManager.start_game()
 

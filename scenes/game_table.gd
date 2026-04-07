@@ -11,9 +11,11 @@ extends Node2D
 const SEAT_SCENE      := preload("res://ui/player_seat.tscn")
 const BETTING_SCENE   := preload("res://ui/betting_controls.tscn")
 const _CardView = preload("res://ui/card_view.tscn")
-const _FiveCardDraw   := preload("res://games/five_card_draw.gd")
-const _TexasHoldem    := preload("res://games/texas_holdem.gd")
-const _SevenCardStud  := preload("res://games/seven_card_stud.gd")
+const _FiveCardDraw    := preload("res://games/five_card_draw.gd")
+const _TexasHoldem     := preload("res://games/texas_holdem.gd")
+const _SevenCardStud   := preload("res://games/seven_card_stud.gd")
+const _DeucesWild      := preload("res://games/deuces_wild.gd")
+const _DeucesWildStud  := preload("res://games/deuces_wild_stud.gd")
 const _PlayerState    := preload("res://core/player_state.gd")
 
 ## Seat display positions for up to 5 players (1920×1080 table).
@@ -58,6 +60,7 @@ var _pot_sprites: Array         = []     # Sprite2D nodes currently in the pot
 var _pot_positions: Array       = []     # precomputed scatter Vector2s (MAX_POT_COINS)
 var _prev_pot: int              = 0
 
+@onready var _deuces_label:    Label         = $UI/DeucesLabel
 @onready var _pot_label:       Label         = $UI/PotLabel
 @onready var _action_log:      RichTextLabel = $UI/ActionLog
 @onready var _community_box:   HBoxContainer = $UI/CommunityCards
@@ -75,6 +78,7 @@ func _ready() -> void:
 	_draw_panel.visible      = false
 	_results_overlay.visible = false
 	_community_box.visible   = (GameManager.current_variant == GameManager.GameVariant.TEXAS_HOLDEM)
+	_deuces_label.visible    = GameManager.deuces_wild
 
 	_peer_order = NetworkManager.player_names.keys()
 	_peer_order.sort()
@@ -133,13 +137,14 @@ func _create_seats() -> void:
 		seat.position = SEAT_POSITIONS[display_pos] - Vector2(80, 75)
 
 func _create_game_logic() -> void:
+	var dw := GameManager.deuces_wild
 	match GameManager.current_variant:
 		GameManager.GameVariant.FIVE_CARD_DRAW:
-			_game = _FiveCardDraw.new(self)
+			_game = _DeucesWild.new(self) if dw else _FiveCardDraw.new(self)
 		GameManager.GameVariant.TEXAS_HOLDEM:
 			_game = _TexasHoldem.new(self)
 		GameManager.GameVariant.SEVEN_CARD_STUD:
-			_game = _SevenCardStud.new(self)
+			_game = _DeucesWildStud.new(self) if dw else _SevenCardStud.new(self)
 
 	add_child(_game)
 

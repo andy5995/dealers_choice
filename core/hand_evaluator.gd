@@ -116,6 +116,44 @@ static func evaluate_five(cards: Array) -> Array:
 	r.append_array(ranks)
 	return r
 
+## Best 5-card hand treating all cards of wild_rank as wildcards.
+## Tries every C(candidates, n_wilds) substitution and returns the best result.
+static func best_from_n_with_wilds(cards: Array, wild_rank: int) -> Array:
+	var n_wilds := 0
+	var naturals: Array = []
+	for card in cards:
+		if CardDB.rank_index(card) == wild_rank:
+			n_wilds += 1
+		else:
+			naturals.append(card)
+
+	if n_wilds == 0:
+		return best_from_n(naturals)
+
+	# Candidate replacements: every non-wild card not already held.
+	var held: Dictionary = {}
+	for c in naturals:
+		held[c] = true
+	var candidates: Array = []
+	for r in CardDB.RANKS:
+		if CardDB.RANKS.find(r) == wild_rank:
+			continue
+		for s in CardDB.SUITS:
+			var c: String = r + s
+			if not held.has(c):
+				candidates.append(c)
+
+	var best: Array = []
+	_each_combination(candidates, n_wilds, func(replacements: Array) -> void:
+		var hand: Array = naturals.duplicate()
+		hand.append_array(replacements)
+		var result := evaluate_five(hand)
+		if best.is_empty() or compare(result, best) > 0:
+			best.clear()
+			best.append_array(result)
+	)
+	return best
+
 ## Returns 1 if a > b, -1 if a < b, 0 if equal.
 static func compare(a: Array, b: Array) -> int:
 	for i in range(mini(a.size(), b.size())):
