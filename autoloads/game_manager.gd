@@ -13,7 +13,19 @@ var min_bet: int = 20
 var dealer_peer_id: int = 0
 signal dealer_changed(new_dealer_id: int)
 
+
 ## Advance the dealer to the next player (server only). Broadcasts to all peers.
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		var toggle: bool = event.keycode == KEY_F11 \
+			or (event.keycode == KEY_ENTER and event.alt_pressed)
+		if toggle:
+			var mode := DisplayServer.window_get_mode()
+			if mode == DisplayServer.WINDOW_MODE_FULLSCREEN:
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+			else:
+				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+
 func advance_dealer() -> void:
 	if not NetworkManager.is_server():
 		return
