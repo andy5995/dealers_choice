@@ -117,6 +117,14 @@ func _ready() -> void:
 	_betting_ctrl.offset_bottom = -20
 	_betting_ctrl.action_chosen.connect(_on_action_chosen)
 
+	const TIMER_SIZE := 150.0
+	const TIMER_MARGIN := 20.0
+	_clock_timer.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_clock_timer.offset_left   = -TIMER_SIZE * 0.5
+	_clock_timer.offset_right  =  TIMER_SIZE * 0.5
+	_clock_timer.offset_top    = -TIMER_SIZE - TIMER_MARGIN
+	_clock_timer.offset_bottom = -TIMER_MARGIN
+
 	if NetworkManager.is_server():
 		_create_game_logic()
 

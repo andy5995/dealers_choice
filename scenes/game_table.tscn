@@ -94,10 +94,6 @@ visible = false
 
 [node name="TurnTimer" type="Control" parent="UI"]
 script = ExtResource("2")
-offset_left = 1620.0
-offset_top = 20.0
-offset_right = 1770.0
-offset_bottom = 170.0
 visible = false
 
 [node name="ActionLog" type="RichTextLabel" parent="UI"]
