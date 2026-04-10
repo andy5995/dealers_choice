@@ -335,7 +335,8 @@ func _apply_pot_coins(pot: int, actor_idx: int) -> void:
 		var idx: int   = _pot_sprites.size()
 		var sp         = Sprite2D.new()
 		sp.texture     = _coin_tex
-		var scale_f    = float(COIN_DISPLAY_SIZE) / 96.0
+		var tex_size   = maxf(_coin_tex.get_width(), _coin_tex.get_height())
+		var scale_f    = float(COIN_DISPLAY_SIZE) / tex_size
 		sp.scale       = Vector2(scale_f, scale_f)
 		sp.position    = _pot_positions[idx]
 		_pot_root.add_child(sp)
