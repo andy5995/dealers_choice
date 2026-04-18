@@ -65,30 +65,46 @@ anchor_bottom = 1.0
 color = Color(0, 0.49, 0, 1)
 
 [node name="Title" type="Label" parent="."]
-offset_left = 640.0
-offset_top = 60.0
-offset_right = 1900.0
-offset_bottom = 158.0
+anchors_preset = 13
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 20.0
+offset_top = 30.0
+offset_right = -20.0
+offset_bottom = 110.0
 text = "That GD Poker Suite"
+horizontal_alignment = 1
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 72
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 
 [node name="Subtitle" type="Label" parent="."]
-offset_left = 685.0
-offset_top = 162.0
-offset_right = 1900.0
-offset_bottom = 198.0
+anchors_preset = 13
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 20.0
+offset_top = 114.0
+offset_right = -20.0
+offset_bottom = 150.0
 text = "Texas Hold'em · 5-Card Draw · 7-Card Stud"
+horizontal_alignment = 1
 theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 1, 1, 0.85)
 
 [node name="Form" type="VBoxContainer" parent="."]
-offset_left = 100.0
-offset_top = 235.0
-offset_right = 870.0
-offset_bottom = 560.0
+anchor_left = 0.1
+anchor_top = 0.0
+anchor_right = 0.9
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 160.0
+offset_right = 0.0
+offset_bottom = 450.0
 theme_override_constants/separation = 18
 
 [node name="NameRow" type="HBoxContainer" parent="Form"]

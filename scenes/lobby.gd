@@ -5,6 +5,7 @@ extends Control
 @onready var _dealer_panel:  VBoxContainer = $DealerPanel
 @onready var _waiting_label: Label         = $WaitingLabel
 @onready var _holdem_btn:    Button        = $DealerPanel/BtnRow/HoldemBtn
+@onready var _lowball_btn:   Button        = $DealerPanel/BtnRow/LowballBtn
 @onready var _deuces_btn:    Button        = $DealerPanel/BtnRow/DeucesBtn
 
 func _ready() -> void:
@@ -39,7 +40,8 @@ func _refresh(_ignored: int = 0) -> void:
 	for btn in $DealerPanel/BtnRow.get_children():
 		(btn as Button).disabled = not can_start
 	if can_start:
-		_holdem_btn.disabled = dw_on
+		_holdem_btn.disabled  = dw_on
+		_lowball_btn.disabled = dw_on
 	_waiting_label.visible = not i_am_dealer
 	if not i_am_dealer:
 		if GameManager.dealer_peer_id == 0:
@@ -90,6 +92,9 @@ func _on_draw_pressed() -> void:
 
 func _on_stud_pressed() -> void:
 	_submit_variant(GameManager.GameVariant.SEVEN_CARD_STUD)
+
+func _on_lowball_pressed() -> void:
+	_submit_variant(GameManager.GameVariant.CALIFORNIA_LOWBALL)
 
 func _on_deuces_pressed() -> void:
 	_refresh()  # toggled — re-evaluate which buttons are enabled

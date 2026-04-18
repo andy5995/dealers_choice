@@ -154,6 +154,20 @@ static func best_from_n_with_wilds(cards: Array, wild_rank: int) -> Array:
 	)
 	return best
 
+## Ace-to-Five Lowball: aces low, straights/flushes don't count.
+## Returns a value compatible with compare() — higher result = better (lower) hand.
+static func evaluate_lowball(cards: Array) -> Array:
+	var ranks: Array[int] = []
+	for card in cards:
+		var r: int = CardDB.rank_index(card)
+		ranks.append(-1 if r == 12 else r)  # Ace → -1 (below 2)
+	ranks.sort()
+	ranks.reverse()  # high card first
+	var result: Array = [0]
+	for r in ranks:
+		result.append(-r)  # negate: lower rank → higher score → wins
+	return result
+
 ## Returns 1 if a > b, -1 if a < b, 0 if equal.
 static func compare(a: Array, b: Array) -> int:
 	for i in range(mini(a.size(), b.size())):

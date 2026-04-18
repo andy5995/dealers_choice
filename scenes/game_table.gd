@@ -14,8 +14,9 @@ const _CardView = preload("res://ui/card_view.tscn")
 const _FiveCardDraw    := preload("res://games/five_card_draw.gd")
 const _TexasHoldem     := preload("res://games/texas_holdem.gd")
 const _SevenCardStud   := preload("res://games/seven_card_stud.gd")
-const _DeucesWild      := preload("res://games/deuces_wild.gd")
-const _DeucesWildStud  := preload("res://games/deuces_wild_stud.gd")
+const _DeucesWild          := preload("res://games/deuces_wild.gd")
+const _DeucesWildStud      := preload("res://games/deuces_wild_stud.gd")
+const _CaliforniaLowball   := preload("res://games/california_lowball.gd")
 const _PlayerState    := preload("res://core/player_state.gd")
 
 ## Seat display positions for up to 5 players (1920×1080 table).
@@ -153,6 +154,8 @@ func _create_game_logic() -> void:
 			_game = _TexasHoldem.new(self)
 		GameManager.GameVariant.SEVEN_CARD_STUD:
 			_game = _DeucesWildStud.new(self) if dw else _SevenCardStud.new(self)
+		GameManager.GameVariant.CALIFORNIA_LOWBALL:
+			_game = _CaliforniaLowball.new(self)
 
 	add_child(_game)
 

@@ -2,7 +2,7 @@ extends Node
 ## Autoload name: GameManager
 ## Holds game configuration and triggers scene transitions.
 
-enum GameVariant { FIVE_CARD_DRAW, TEXAS_HOLDEM, SEVEN_CARD_STUD }
+enum GameVariant { FIVE_CARD_DRAW, TEXAS_HOLDEM, SEVEN_CARD_STUD, CALIFORNIA_LOWBALL }
 
 var current_variant: GameVariant = GameVariant.TEXAS_HOLDEM
 var deuces_wild: bool = false

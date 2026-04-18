@@ -269,13 +269,13 @@ func _do_showdown() -> void:
 	for seat in contenders:
 		reveal[_players[seat].peer_id] = {
 			"hand":      _players[seat].hand,
-			"hand_name": _HandEval.hand_name(hand_values[seat]),
+			"hand_name": _showdown_hand_name(hand_values[seat], _players[seat].hand),
 			"is_winner": winners.has(seat),
 		}
 
 	_last_action_text = "%s wins with %s!" % [
 		_players[winners[0]].display_name,
-		_HandEval.hand_name(best_value)
+		_showdown_hand_name(best_value, _players[winners[0]].hand)
 	]
 	_broadcast_state()
 	_table.receive_game_over.rpc(reveal)
@@ -383,6 +383,9 @@ func _build_public_state() -> Dictionary:
 
 func _evaluate_hand(cards: Array) -> Array:
 	return _HandEval.best_from_n(cards)
+
+func _showdown_hand_name(value: Array, _cards: Array) -> String:
+	return _HandEval.hand_name(value)
 
 func _get_community_cards() -> Array:
 	return []
