@@ -46,11 +46,16 @@ func host_server() -> Error:
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	return OK
 
+static func _is_local_address(addr: String) -> bool:
+	return addr == "127.0.0.1" or addr == "localhost" \
+		or addr.begins_with("192.168.") or addr.begins_with("10.") \
+		or addr.begins_with("172.")
+
 func join(address: String, my_name: String) -> Error:
 	disconnect_all()  # clean up any previous attempt
 	peer = WebSocketMultiplayerPeer.new()
 	var url: String
-	if address == "127.0.0.1" or address == "localhost":
+	if _is_local_address(address):
 		url = "ws://%s:%d" % [address, SERVER_PORT]
 	else:
 		url = "wss://%s:%d/ws" % [address, PORT]
