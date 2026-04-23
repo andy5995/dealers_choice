@@ -19,18 +19,21 @@ const _DeucesWildStud      := preload("res://games/deuces_wild_stud.gd")
 const _CaliforniaLowball   := preload("res://games/california_lowball.gd")
 const _PlayerState    := preload("res://core/player_state.gd")
 
-## Seat display positions for up to 5 players (1920×1080 table).
+## Seat top-left positions as fractions of viewport size, for up to 5 players.
 ## Index 0 = local player (upper-left lower slot).
 ## Index 1 = directly above local player (upper-left upper slot).
 ## Indices 2-4 = right column top→bottom (index 2 opposite index 1).
-## seat.position = SEAT_POSITIONS[display_pos] - Vector2(80, 75) → top-left of 240×225 seat.
-const SEAT_POSITIONS := [
-	Vector2(110, 365),   # 0: local — upper-left, lower   (top-left ≈ 30, 290)
-	Vector2(110, 105),   # 1: upper-left, above local      (top-left ≈ 30, 30)
-	Vector2(1090, 105),  # 2: right col top    (top-left ≈ 1010, 30)  = w/2+50
-	Vector2(1090, 365),  # 3: right col middle (top-left ≈ 1010, 290)
-	Vector2(1090, 625),  # 4: right col lower  (top-left ≈ 1010, 550)
+const SEAT_POS_FRACS := [
+	Vector2(0.016, 0.269),  # 0: local — upper-left, lower
+	Vector2(0.016, 0.028),  # 1: upper-left, above local
+	Vector2(0.526, 0.028),  # 2: right col top
+	Vector2(0.526, 0.269),  # 3: right col middle
+	Vector2(0.526, 0.509),  # 4: right col lower
 ]
+
+## Seat minimum size as a fraction of viewport width.
+const SEAT_W_FRAC  = 0.125   # 120 / 960
+const SEAT_H_FRAC  = 0.207   # 112 / 540
 
 ## Coin image paths — loaded at runtime so missing .import files don't block parse.
 const _COIN_PATHS: Array = [
@@ -41,11 +44,12 @@ const _COIN_PATHS: Array = [
 	"res://assets/images/coins/96x96-Marcus Antonius - Cleopatra 32 BC 90020163_front.png",
 	"res://assets/images/coins/96x96-Marcus Antonius - Cleopatra 32 BC 90020163_back.png",
 ]
-const COIN_DISPLAY_SIZE  = 96   # full 96px in the pot; icon on seats is smaller
-const MAX_POT_COINS      = 40
-## Centre of the scatter field — between community cards and player seats.
-const POT_CENTER         = Vector2(960, 735)
-const POT_SCATTER_RADIUS = 180.0
+const MAX_POT_COINS = 40
+
+## Layout values computed from viewport size at _ready.
+var _coin_display_size: int  = 48
+var _pot_center: Vector2     = Vector2(480, 370)
+var _pot_scatter_radius: float = 90.0
 
 var _game          = null   # BaseGame subclass, server only
 var _seat_nodes: Array = [] # PlayerSeat nodes
@@ -84,14 +88,20 @@ func _ready() -> void:
 	_peer_order = NetworkManager.player_names.keys()
 	_peer_order.sort()
 
+	# ── Viewport-derived layout values ────────────────────────────────────────
+	var vp := get_viewport().get_visible_rect().size
+	_coin_display_size  = int(vp.x * 0.05)
+	_pot_center         = vp * Vector2(0.5, 0.685)
+	_pot_scatter_radius = vp.y * 0.167
+
 	# ── Coins ─────────────────────────────────────────────────────────────────
 	_coin_tex = load(_COIN_PATHS[randi() % _COIN_PATHS.size()])
 
 	# Precompute MAX_POT_COINS random scatter positions (stable for the session).
 	for _i in MAX_POT_COINS:
 		var angle = randf() * TAU
-		var dist  = randf() * POT_SCATTER_RADIUS
-		_pot_positions.append(POT_CENTER + Vector2(cos(angle), sin(angle)) * dist)
+		var dist  = randf() * _pot_scatter_radius
+		_pot_positions.append(_pot_center + Vector2(cos(angle), sin(angle)) * dist)
 
 	# Container rendered just above the table background, below seats/UI.
 	_pot_root = Node2D.new()
@@ -103,28 +113,28 @@ func _ready() -> void:
 	# Pass coin icon to every seat.
 	if _coin_tex:
 		for seat in _seat_nodes:
-			seat.set_coin_icon(_coin_tex, COIN_DISPLAY_SIZE / 2)
+			seat.set_coin_icon(_coin_tex, _coin_display_size / 2)
 
 	_betting_ctrl = BETTING_SCENE.instantiate()
 	$UI.add_child(_betting_ctrl)
-	# Position at lower-left starting at ~1/3 screen width, auto-sized by content.
-	_betting_ctrl.anchor_left   = 0.0
-	_betting_ctrl.anchor_right  = 0.0
+	# Centered lower-third of screen, height auto-sized by content.
+	_betting_ctrl.anchor_left   = 1.0 / 3.0
+	_betting_ctrl.anchor_right  = 690.0 / 960.0
 	_betting_ctrl.anchor_top    = 1.0
 	_betting_ctrl.anchor_bottom = 1.0
-	_betting_ctrl.offset_left   = 640
-	_betting_ctrl.offset_top    = -145
-	_betting_ctrl.offset_right  = 1380
-	_betting_ctrl.offset_bottom = -20
+	_betting_ctrl.offset_left   = 0
+	_betting_ctrl.offset_right  = 0
+	_betting_ctrl.offset_top    = -int(vp.y * 0.133)
+	_betting_ctrl.offset_bottom = -int(vp.y * 0.019)
 	_betting_ctrl.action_chosen.connect(_on_action_chosen)
 
-	const TIMER_SIZE := 150.0
-	const TIMER_MARGIN := 20.0
+	var timer_size   := vp.y * 0.139
+	var timer_margin := vp.y * 0.019
 	_clock_timer.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_clock_timer.offset_left   = -TIMER_SIZE * 0.5
-	_clock_timer.offset_right  =  TIMER_SIZE * 0.5
-	_clock_timer.offset_top    = -TIMER_SIZE - TIMER_MARGIN
-	_clock_timer.offset_bottom = -TIMER_MARGIN
+	_clock_timer.offset_left   = -timer_size * 0.5
+	_clock_timer.offset_right  =  timer_size * 0.5
+	_clock_timer.offset_top    = -timer_size - timer_margin
+	_clock_timer.offset_bottom = -timer_margin
 
 	if NetworkManager.is_server():
 		_create_game_logic()
@@ -137,13 +147,16 @@ func _process(delta: float) -> void:
 func _create_seats() -> void:
 	var my_index := _peer_order.find(_my_peer_id)
 	var n := _peer_order.size()
+	var vp := get_viewport().get_visible_rect().size
+	var seat_min := Vector2(vp.x * SEAT_W_FRAC, vp.y * SEAT_H_FRAC)
 	for i in n:
 		var seat = SEAT_SCENE.instantiate()
 		add_child(seat)
 		seat.peer_id = _peer_order[i]
+		seat.custom_minimum_size = seat_min
 		_seat_nodes.append(seat)
 		var display_pos := (i - my_index + n) % n
-		seat.position = SEAT_POSITIONS[display_pos] - Vector2(80, 75)
+		seat.position = vp * SEAT_POS_FRACS[display_pos]
 
 func _create_game_logic() -> void:
 	var dw := GameManager.deuces_wild
@@ -339,7 +352,7 @@ func _apply_pot_coins(pot: int, actor_idx: int) -> void:
 		var sp         = Sprite2D.new()
 		sp.texture     = _coin_tex
 		var tex_size   = maxf(_coin_tex.get_width(), _coin_tex.get_height())
-		var scale_f    = float(COIN_DISPLAY_SIZE) / tex_size
+		var scale_f    = float(_coin_display_size) / tex_size
 		sp.scale       = Vector2(scale_f, scale_f)
 		sp.position    = _pot_positions[idx]
 		_pot_root.add_child(sp)
@@ -348,7 +361,7 @@ func _apply_pot_coins(pot: int, actor_idx: int) -> void:
 		# Animate from actor seat when the pot increased.
 		if pot > _prev_pot and actor_idx >= 0 and actor_idx < _seat_nodes.size():
 			var seat       = _seat_nodes[actor_idx]
-			var start_pos: Vector2 = seat.position + Vector2(120, 112)
+			var start_pos: Vector2 = seat.position + seat.size * 0.5
 			sp.position = start_pos
 			var tw = create_tween()
 			tw.tween_property(sp, "position", _pot_positions[idx], 0.3)

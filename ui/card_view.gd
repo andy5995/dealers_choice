@@ -26,7 +26,7 @@ const _SUIT_TEX = {
 }
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(96, 84)
+	custom_minimum_size = Vector2(48, 42)
 
 func show_card(name: String, face_up: bool = true) -> void:
 	card_name = name
@@ -71,22 +71,22 @@ func _draw_face(r: Rect2) -> void:
 	var col: Color       = _RED if suit_ch in ["D", "H"] else _BLACK
 	var font: Font       = ThemeDB.fallback_font
 
-	# Rank on the left, vertically centred
-	var rank_sz := 45
+	# Rank on the left, vertically centred — proportional to card height
+	var rank_sz := int(r.size.y * 0.52)
 	var ry: float = (r.size.y + rank_sz * 0.72) * 0.5
-	draw_string(font, Vector2(9.0, ry), rank_str, HORIZONTAL_ALIGNMENT_LEFT, -1, rank_sz, col)
+	draw_string(font, Vector2(r.size.x * 0.08, ry), rank_str, HORIZONTAL_ALIGNMENT_LEFT, -1, rank_sz, col)
 
-	# Suit texture on the right, vertically centred
+	# Suit texture on the right, vertically centred — proportional to card height
 	var tex: Texture2D = _SUIT_TEX.get(suit_ch)
 	if tex:
-		var s    := 39.0
-		var cx   := r.size.x - s - 6.0
+		var s    := r.size.y * 0.45
+		var cx   := r.size.x - s - r.size.x * 0.06
 		var cy   := (r.size.y - s) * 0.5
 		draw_texture_rect(tex, Rect2(Vector2(cx, cy), Vector2(s, s)), false, col)
 
 func _draw_back(r: Rect2) -> void:
 	draw_rect(r, _BACK_BG)
-	var step := 8.0
+	var step := r.size.x / 12.0
 	var w    := r.size.x
 	var h    := r.size.y
 	var i    := -h

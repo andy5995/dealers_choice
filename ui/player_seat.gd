@@ -17,7 +17,8 @@ var _coin_icon: TextureRect = null
 @onready var _dealer_chip:  Label         = $DealerChip
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(240, 225)
+	if custom_minimum_size == Vector2.ZERO:
+		custom_minimum_size = Vector2(120, 112)  # fallback when not set by GameTable
 
 ## Set the coin icon displayed next to the chip count (called once by GameTable).
 func set_coin_icon(tex: Texture2D, icon_size: int = 48) -> void:

@@ -1,61 +1,14 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/main_menu.gd" id="1"]
 [ext_resource type="FontFile" path="res://assets/fonts/LiberationSerif-BoldItalic.ttf" id="2"]
-[ext_resource type="FontFile" path="res://assets/fonts/LiberationSans-Bold.ttf" id="3"]
-
-[sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.3, 0.3, 0.3, 1)
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-
-[sub_resource type="StyleBoxFlat" id="2"]
-bg_color = Color(0.08, 0.08, 0.08, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.65, 0.65, 0.65, 1)
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-
-[sub_resource type="StyleBoxFlat" id="3"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.12, 0.12, 0.12, 1)
-content_margin_left = 16.0
-content_margin_top = 9.0
-content_margin_right = 12.0
-content_margin_bottom = 5.0
-
-[sub_resource type="StyleBoxFlat" id="4"]
-bg_color = Color(0.12, 0.12, 0.12, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.22, 0.22, 0.22, 1)
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+[ext_resource type="Theme" path="res://ui/poker_theme.tres" id="3"]
 
 [node name="MainMenu" type="Control"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource("3")
 script = ExtResource("1")
 
 [node name="Background" type="ColorRect" parent="."]
@@ -92,7 +45,6 @@ offset_right = -20.0
 offset_bottom = 150.0
 text = "Texas Hold'em · 5-Card Draw · 7-Card Stud"
 horizontal_alignment = 1
-theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 1, 1, 0.85)
 
@@ -114,7 +66,6 @@ theme_override_constants/separation = 10
 text = "Your name:"
 custom_minimum_size = Vector2(190, 0)
 vertical_alignment = 1
-theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 26
 
 [node name="NameInput" type="LineEdit" parent="Form/NameRow"]
@@ -129,7 +80,6 @@ theme_override_constants/separation = 10
 text = "Server address:"
 custom_minimum_size = Vector2(190, 0)
 vertical_alignment = 1
-theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 26
 
 [node name="IPInput" type="LineEdit" parent="Form/ServerRow"]
@@ -140,21 +90,12 @@ theme_override_font_sizes/font_size = 24
 [node name="JoinBtn" type="Button" parent="Form"]
 text = "Join Game"
 custom_minimum_size = Vector2(0, 50)
-theme_override_styles/normal = SubResource("1")
-theme_override_styles/hover = SubResource("2")
-theme_override_styles/pressed = SubResource("3")
-theme_override_styles/disabled = SubResource("4")
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.3, 1)
-theme_override_colors/font_pressed_color = Color(0.85, 0.85, 0, 1)
-theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 26
 
 [node name="StatusLabel" type="Label" parent="Form"]
 text = ""
 horizontal_alignment = 0
 autowrap_mode = 3
-theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 24
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 
