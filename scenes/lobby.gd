@@ -15,8 +15,15 @@ func _ready() -> void:
 	NetworkManager.server_disconnected.connect(_on_server_disconnected)
 	GameManager.dealer_changed.connect(_on_dealer_changed)
 
-	# Re-broadcast dealer so clients that just loaded the scene are in sync.
 	if NetworkManager.is_server():
+		# If the assigned dealer disconnected between advance_dealer() and lobby
+		# loading (e.g. during the 0.5 s window in _end_hand), nobody would
+		# match the stale ID and the dealer panel would never appear.
+		var dealer_gone := GameManager.dealer_peer_id != 0 \
+			and not NetworkManager.player_names.has(GameManager.dealer_peer_id)
+		if dealer_gone and not NetworkManager.player_names.is_empty():
+			GameManager.dealer_peer_id = 0
+			GameManager.advance_dealer()
 		GameManager.broadcast_dealer()
 	_refresh()
 
