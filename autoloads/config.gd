@@ -6,6 +6,7 @@ extends Node
 const _DEFAULT_PATH := "res://server.cfg"
 
 var turn_timeout_sec: float = 30.0
+var draw_timeout_sec: float = 30.0
 ## 1 = forward through player order, -1 = backward.
 var dealer_rotation: int = 1
 
@@ -14,6 +15,7 @@ func _ready() -> void:
 	if cfg.load(_config_path()) != OK:
 		return
 	turn_timeout_sec = maxf(cfg.get_value("game", "turn_timeout_sec", turn_timeout_sec), 5.0)
+	draw_timeout_sec = maxf(cfg.get_value("game", "draw_timeout_sec", draw_timeout_sec), 5.0)
 	var dir: int = cfg.get_value("game", "dealer_rotation", dealer_rotation)
 	dealer_rotation = 1 if dir >= 0 else -1
 

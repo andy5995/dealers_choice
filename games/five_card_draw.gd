@@ -4,9 +4,17 @@ extends "res://games/base_game.gd"
 
 var _draw_queue: Array = []      # peer_ids ordered left-of-dealer, waiting to draw
 var _waiting_for_discards: bool = false
+var _draw_timer: Timer = null
 
 enum DrawPhase { NONE, FIRST_BETTING, AWAITING_DRAWS, SECOND_BETTING }
 var _draw_phase: DrawPhase = DrawPhase.NONE
+
+func _ready() -> void:
+	super._ready()
+	_draw_timer = Timer.new()
+	_draw_timer.one_shot = true
+	_draw_timer.timeout.connect(_on_draw_timeout)
+	add_child(_draw_timer)
 
 func _start_hand_impl() -> void:
 	for p in _players:
@@ -63,8 +71,14 @@ func _request_next_draw() -> void:
 		_table._show_draw_controls(p.hand)
 	else:
 		_table.request_discards.rpc_id(next_pid, p.hand)
+	_draw_timer.start(Config.draw_timeout_sec)
+
+func _on_draw_timeout() -> void:
+	if not _draw_queue.is_empty():
+		receive_discards(_draw_queue[0], [])
 
 func receive_discards(peer_id: int, indices: Array) -> void:
+	_draw_timer.stop()
 	if not _waiting_for_discards:
 		return
 	if _draw_queue.is_empty() or _draw_queue[0] != peer_id:
