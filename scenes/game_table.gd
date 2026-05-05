@@ -117,9 +117,9 @@ func _ready() -> void:
 
 	_betting_ctrl = BETTING_SCENE.instantiate()
 	$UI.add_child(_betting_ctrl)
-	# Centered lower-third of screen, height auto-sized by content.
-	_betting_ctrl.anchor_left   = 1.0 / 3.0
-	_betting_ctrl.anchor_right  = 690.0 / 960.0
+	# Left-aligned, ending before the centre timer. Height auto-sized by content.
+	_betting_ctrl.anchor_left   = 0.0
+	_betting_ctrl.anchor_right  = 370.0 / 960.0
 	_betting_ctrl.anchor_top    = 1.0
 	_betting_ctrl.anchor_bottom = 1.0
 	_betting_ctrl.offset_left   = 0
