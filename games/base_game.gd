@@ -360,6 +360,13 @@ func _valid_actions_for(p, seat: int) -> Array:
 		actions.append("bet" if _current_bet == 0 else "raise")
 	return actions
 
+## Returns {actor_index, turn_time_left, turn_duration} for the current phase.
+## Subclasses with their own timers (e.g. draw round) override this.
+func _get_phase_timer_info() -> Dictionary:
+	var elapsed_sec: float = (Time.get_ticks_usec() - _turn_start_usec) / 1_000_000.0 if _turn_start_usec > 0 else TURN_TIMEOUT_SEC
+	var time_left: float = maxf(TURN_TIMEOUT_SEC - elapsed_sec, 0.0) if _current_actor >= 0 else 0.0
+	return {"actor_index": _current_actor, "turn_time_left": time_left, "turn_duration": TURN_TIMEOUT_SEC}
+
 func _build_public_state() -> Dictionary:
 	var player_dicts: Array = []
 	for i in range(_players.size()):
@@ -367,19 +374,18 @@ func _build_public_state() -> Dictionary:
 		d["round_bet"]  = _round_bets[i] if _round_bets.size() > i else 0
 		d["is_dealer"]  = (i == _dealer_index)
 		player_dicts.append(d)
-	var elapsed_sec: float = (Time.get_ticks_usec() - _turn_start_usec) / 1_000_000.0 if _turn_start_usec > 0 else TURN_TIMEOUT_SEC
-	var time_left: float = maxf(TURN_TIMEOUT_SEC - elapsed_sec, 0.0) if _current_actor >= 0 else 0.0
+	var timer := _get_phase_timer_info()
 	return {
 		"phase":           int(_phase),
 		"pot":             _pot,
 		"current_bet":     _current_bet,
 		"dealer_index":    _dealer_index,
-		"actor_index":     _current_actor,
+		"actor_index":     timer["actor_index"],
 		"community_cards": _get_community_cards(),
 		"last_action":     _last_action_text,
 		"players":         player_dicts,
-		"turn_time_left":  time_left,
-		"turn_duration":   TURN_TIMEOUT_SEC,
+		"turn_time_left":  timer["turn_time_left"],
+		"turn_duration":   timer["turn_duration"],
 	}
 
 func _evaluate_hand(cards: Array) -> Array:

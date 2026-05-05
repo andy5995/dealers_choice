@@ -73,6 +73,18 @@ func _request_next_draw() -> void:
 		_table.request_discards.rpc_id(next_pid, p.hand)
 	_draw_timer.start(Config.draw_timeout_sec)
 
+func _get_phase_timer_info() -> Dictionary:
+	if _draw_phase == DrawPhase.AWAITING_DRAWS and _waiting_for_discards and not _draw_queue.is_empty():
+		# Use the full duration when the timer is stopped (not yet started for the
+		# current player, or just fired), so the client clock starts from 1.0.
+		var time_left := Config.draw_timeout_sec if _draw_timer.is_stopped() else _draw_timer.time_left
+		return {
+			"actor_index":    _seat_of(_draw_queue[0]),
+			"turn_time_left": time_left,
+			"turn_duration":  Config.draw_timeout_sec,
+		}
+	return super._get_phase_timer_info()
+
 func _on_draw_timeout() -> void:
 	if not _draw_queue.is_empty():
 		receive_discards(_draw_queue[0], [])
