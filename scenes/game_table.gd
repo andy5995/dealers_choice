@@ -249,6 +249,17 @@ func _show_draw_controls(_hand: Array) -> void:
 func _apply_public_state(state: Dictionary) -> void:
 	var pot: int       = state.get("pot", 0)
 	var actor_idx: int = state.get("actor_index", -1)
+	var phase: int     = state.get("phase", 0)
+
+	# Dismiss the draw panel if it's no longer our turn to draw.
+	# Phase 4 = BaseGame.Phase.DRAW
+	if _draw_panel.visible:
+		var my_seat_idx := _peer_order.find(_my_peer_id)
+		if not (phase == 4 and actor_idx == my_seat_idx):
+			_draw_panel.visible = false
+			var my_seat = _get_seat(_my_peer_id)
+			if my_seat:
+				my_seat.enable_card_selection(false)
 
 	_pot_label.text = "Pot: %d" % pot
 	_apply_pot_coins(pot, actor_idx)
