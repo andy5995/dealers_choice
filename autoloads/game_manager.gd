@@ -37,7 +37,7 @@ func advance_dealer() -> void:
 		dealer_peer_id = peers[0]
 	else:
 		var idx: int = peers.find(dealer_peer_id)
-		dealer_peer_id = peers[(idx + 1) % peers.size()]
+		dealer_peer_id = peers[(idx + Config.dealer_rotation + peers.size()) % peers.size()]
 	_sync_dealer.rpc(dealer_peer_id)
 
 ## Re-broadcast the current dealer to all peers (useful after scene changes).

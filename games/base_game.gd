@@ -13,7 +13,8 @@ const PS_FOLDED      := 1
 const PS_ALL_IN      := 2
 const PS_SITTING_OUT := 3
 
-const TURN_TIMEOUT_SEC = 30.0
+var TURN_TIMEOUT_SEC: float:
+	get: return Config.turn_timeout_sec
 
 var _table                   # GameTable ref — untyped for duck-typed RPC calls
 var _deck                    # Deck instance
