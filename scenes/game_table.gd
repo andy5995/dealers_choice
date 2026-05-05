@@ -122,10 +122,10 @@ func _ready() -> void:
 	_betting_ctrl.anchor_right  = 370.0 / 960.0
 	_betting_ctrl.anchor_top    = 1.0
 	_betting_ctrl.anchor_bottom = 1.0
-	_betting_ctrl.offset_left   = 0
+	_betting_ctrl.offset_left   = int(vp.x * 0.016)
 	_betting_ctrl.offset_right  = 0
 	_betting_ctrl.offset_top    = -int(vp.y * 0.133)
-	_betting_ctrl.offset_bottom = -int(vp.y * 0.019)
+	_betting_ctrl.offset_bottom = -int(vp.y * 0.037)
 	_betting_ctrl.action_chosen.connect(_on_action_chosen)
 
 	var timer_size   := vp.y * 0.139
