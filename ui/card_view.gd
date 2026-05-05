@@ -54,6 +54,8 @@ func _gui_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	var r := Rect2(Vector2.ZERO, size)
+	if r.size.x < 2 or r.size.y < 2:
+		return
 	if is_face_up and card_name != CardDB.BACK_CARD:
 		_draw_face(r)
 	else:
