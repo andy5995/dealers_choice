@@ -4,6 +4,12 @@ extends "res://games/five_card_draw.gd"
 ## Aces are always low; straights and flushes don't count against you.
 ## Best possible hand: A-2-3-4-5.
 
+func _hard_max_discards() -> int:
+	return 3
+
+func _max_discards(_hand: Array, _discard_indices: Array) -> int:
+	return 3
+
 func _evaluate_hand(cards: Array) -> Array:
 	return _HandEval.evaluate_lowball(cards)
 

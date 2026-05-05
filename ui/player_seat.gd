@@ -5,6 +5,8 @@ extends Control
 
 const _CardView = preload("res://ui/card_view.tscn")
 
+signal card_selection_changed
+
 var peer_id: int = 0
 var _card_views: Array = []   # holds CardView nodes
 var _coin_icon: TextureRect = null
@@ -70,6 +72,15 @@ func update_private(data: Dictionary) -> void:
 func enable_card_selection(enabled: bool) -> void:
 	for cv in _card_views:
 		cv.set_selectable(enabled)
+		if enabled:
+			if not cv.selection_changed.is_connected(_on_cv_selection_changed):
+				cv.selection_changed.connect(_on_cv_selection_changed)
+		else:
+			if cv.selection_changed.is_connected(_on_cv_selection_changed):
+				cv.selection_changed.disconnect(_on_cv_selection_changed)
+
+func _on_cv_selection_changed(_card_name: String, _selected: bool) -> void:
+	card_selection_changed.emit()
 
 ## Returns indices of selected (to-discard) cards.
 func get_selected_indices() -> Array[int]:

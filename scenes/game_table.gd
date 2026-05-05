@@ -70,6 +70,8 @@ var _prev_pot: int              = 0
 @onready var _action_log:      RichTextLabel = $UI/ActionLog
 @onready var _community_box:   HBoxContainer = $UI/CommunityCards
 @onready var _draw_panel:      VBoxContainer = $UI/DrawPanel
+@onready var _draw_label:      Label         = $UI/DrawPanel/DrawLabel
+@onready var _confirm_btn:     Button        = $UI/DrawPanel/ConfirmBtn
 @onready var _results_overlay: Control       = $UI/ResultsOverlay
 @onready var _results_label:   Label         = $UI/ResultsOverlay/CenterBox/InnerVBox/ResultsLabel
 @onready var _next_btn:        Button        = $UI/ResultsOverlay/CenterBox/InnerVBox/NextBtn
@@ -77,11 +79,20 @@ var _prev_pot: int              = 0
 
 var _client_time_left: float = 0.0
 var _turn_duration: float = 30.0
+var _draw_hand: Array = []
+var _draw_hard_max: int = 3
 
 func _ready() -> void:
 	_my_peer_id = NetworkManager.get_my_id()
 	_draw_panel.visible      = false
 	_results_overlay.visible = false
+
+	var lbl_bg := StyleBoxFlat.new()
+	lbl_bg.bg_color = Color(0.05, 0.05, 0.05, 0.88)
+	lbl_bg.set_corner_radius_all(5)
+	lbl_bg.set_content_margin_all(8)
+	_draw_label.add_theme_stylebox_override("normal", lbl_bg)
+	_draw_label.add_theme_color_override("font_color", Color.WHITE)
 	_community_box.visible   = (GameManager.current_variant == GameManager.GameVariant.TEXAS_HOLDEM)
 	_deuces_label.visible    = GameManager.deuces_wild
 
@@ -213,8 +224,8 @@ func receive_your_turn(valid_actions: Array, bet_to_call: int, min_bet: int, my_
 	_show_betting_controls(valid_actions, bet_to_call, min_bet, my_chips)
 
 @rpc("authority", "call_remote", "reliable")
-func request_discards(hand: Array) -> void:
-	_show_draw_controls(hand)
+func request_discards(hand: Array, hard_max: int) -> void:
+	_show_draw_controls(hand, hard_max)
 
 @rpc("authority", "call_local", "reliable")
 func receive_game_over(results: Dictionary) -> void:
@@ -237,12 +248,40 @@ func _show_betting_controls(valid_actions: Array, bet_to_call: int, min_bet: int
 	if _betting_ctrl:
 		_betting_ctrl.setup(valid_actions, bet_to_call, min_bet, my_chips)
 
-func _show_draw_controls(_hand: Array) -> void:
+func _show_draw_controls(hand: Array, hard_max: int) -> void:
+	_draw_hand     = hand
+	_draw_hard_max = hard_max
 	AudioManager.play_my_turn()
 	var my_seat = _get_seat(_my_peer_id)
 	if my_seat:
 		my_seat.enable_card_selection(true)
-	_draw_panel.visible = true
+		my_seat.card_selection_changed.connect(_on_card_selection_changed)
+	_draw_panel.visible  = true
+	_confirm_btn.disabled = false
+	_draw_label.text = "Discard up to 3, or 4 keeping an ace" if hard_max >= 4 \
+		else "Discard up to 3"
+
+func _on_card_selection_changed() -> void:
+	var my_seat = _get_seat(_my_peer_id)
+	if not my_seat:
+		return
+	var selected: Array[int] = my_seat.get_selected_indices()
+	var count: int           = selected.size()
+	if count <= 3:
+		_confirm_btn.disabled = false
+		_draw_label.text = "Stand pat" if count == 0 else "Discard %d" % count
+	elif _draw_hard_max >= 4:
+		var keeping_ace := false
+		for i in range(_draw_hand.size()):
+			if i not in selected and CardDB.rank_index(_draw_hand[i]) == 12:
+				keeping_ace = true
+				break
+		_confirm_btn.disabled = not keeping_ace
+		_draw_label.text = "Discard 4 (keeping ace)" if keeping_ace \
+			else "Keep an ace to discard 4"
+	else:
+		_confirm_btn.disabled = true
+		_draw_label.text = "Maximum 3 discards"
 
 # ── State application ─────────────────────────────────────────────────────────
 
@@ -256,6 +295,7 @@ func _apply_public_state(state: Dictionary) -> void:
 	if _draw_panel.visible:
 		var my_seat_idx := _peer_order.find(_my_peer_id)
 		if not (phase == 4 and actor_idx == my_seat_idx):
+			_disconnect_draw_selection()
 			_draw_panel.visible = false
 			var my_seat = _get_seat(_my_peer_id)
 			if my_seat:
@@ -333,12 +373,18 @@ func _on_action_chosen(action: String, amount: int) -> void:
 	else:
 		submit_action.rpc_id(1, action, amount)
 
+func _disconnect_draw_selection() -> void:
+	var my_seat = _get_seat(_my_peer_id)
+	if my_seat and my_seat.card_selection_changed.is_connected(_on_card_selection_changed):
+		my_seat.card_selection_changed.disconnect(_on_card_selection_changed)
+
 func _on_draw_confirm_pressed() -> void:
 	var my_seat = _get_seat(_my_peer_id)
 	var indices: Array[int] = []
 	if my_seat:
 		indices = my_seat.get_selected_indices()
 		my_seat.enable_card_selection(false)
+	_disconnect_draw_selection()
 	_draw_panel.visible = false
 	if NetworkManager.is_server():
 		_game.receive_discards(_my_peer_id, indices)

@@ -67,11 +67,16 @@ func _request_next_draw() -> void:
 		return
 	var p = _players[seat]
 	var my_id := multiplayer.get_unique_id()
+	var hmax := _hard_max_discards()
 	if next_pid == my_id:
-		_table._show_draw_controls(p.hand)
+		_table._show_draw_controls(p.hand, hmax)
 	else:
-		_table.request_discards.rpc_id(next_pid, p.hand)
+		_table.request_discards.rpc_id(next_pid, p.hand, hmax)
 	_draw_timer.start(Config.draw_timeout_sec)
+
+## Hard cap on discards for this variant. Subclasses may override.
+func _hard_max_discards() -> int:
+	return 4
 
 func _get_phase_timer_info() -> Dictionary:
 	if _draw_phase == DrawPhase.AWAITING_DRAWS and _waiting_for_discards and not _draw_queue.is_empty():
@@ -84,6 +89,15 @@ func _get_phase_timer_info() -> Dictionary:
 			"turn_duration":  Config.draw_timeout_sec,
 		}
 	return super._get_phase_timer_info()
+
+## Max discards allowed. 3 normally; 4 if the player is keeping an ace.
+func _max_discards(hand: Array, discard_indices: Array) -> int:
+	if discard_indices.size() <= 3:
+		return 3
+	for i in range(hand.size()):
+		if i not in discard_indices and CardDB.rank_index(hand[i]) == 12:
+			return 4
+	return 3
 
 func _on_draw_timeout() -> void:
 	if not _draw_queue.is_empty():
@@ -102,12 +116,12 @@ func receive_discards(peer_id: int, indices: Array) -> void:
 	if p.status != PS_ACTIVE:
 		return
 
-	# Validate indices (max 4 discards)
+	# Validate indices then enforce discard limit.
 	var safe_indices: Array[int] = []
 	for idx in indices:
 		if idx is int and idx >= 0 and idx < p.hand.size():
 			safe_indices.append(idx)
-	safe_indices = safe_indices.slice(0, 4)
+	safe_indices = safe_indices.slice(0, _max_discards(p.hand, safe_indices))
 
 	# Remove discarded cards in reverse order, then draw replacements
 	var sorted_idx := safe_indices.duplicate()
