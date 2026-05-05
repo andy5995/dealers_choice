@@ -71,9 +71,12 @@ func _on_player_connected(id: int) -> void:
 				AudioManager.play_server_join()  # non-headless host plays locally
 			else:
 				_play_join_sound.rpc_id(pid)
-		# First player to join triggers dealer selection.
+		# First player to join triggers dealer selection; subsequent joiners
+		# need the existing dealer broadcast so their UI shows it immediately.
 		if GameManager.dealer_peer_id == 0:
 			GameManager.advance_dealer()
+		else:
+			GameManager.broadcast_dealer()
 	_refresh()
 
 @rpc("authority", "call_remote", "reliable")
