@@ -48,6 +48,16 @@ func _ready() -> void:
 	add_child(_turn_timer)
 	NetworkManager.player_disconnected.connect(_on_peer_disconnected)
 
+## Awaitable pause that ties the timer lifetime to this node, preventing
+## SceneTreeTimer leaks when the game node is freed mid-await.
+func _wait(seconds: float) -> void:
+	var t := Timer.new()
+	t.one_shot = true
+	add_child(t)
+	t.start(seconds)
+	await t.timeout
+	t.queue_free()
+
 # ── Public API ────────────────────────────────────────────────────────────────
 
 func begin_game(player_list: Array) -> void:
@@ -57,7 +67,7 @@ func begin_game(player_list: Array) -> void:
 		if _players[i].peer_id == GameManager.dealer_peer_id:
 			_dealer_index = i
 			break
-	await get_tree().create_timer(0.5).timeout
+	await _wait(0.5)
 	start_hand()
 
 func start_hand() -> void:
@@ -230,7 +240,7 @@ func _award_last_standing() -> void:
 			reveal[p.peer_id] = {"hand": [], "hand_name": "", "is_winner": false}
 	_broadcast_state()
 	_table.receive_game_over.rpc(reveal)
-	await get_tree().create_timer(15.0).timeout
+	await _wait(15.0)
 	_end_hand()
 
 func _do_showdown() -> void:
@@ -280,7 +290,7 @@ func _do_showdown() -> void:
 	]
 	_broadcast_state()
 	_table.receive_game_over.rpc(reveal)
-	await get_tree().create_timer(15.0).timeout
+	await _wait(15.0)
 	_end_hand()
 
 func _end_hand() -> void:
@@ -299,7 +309,7 @@ func _end_hand() -> void:
 		return
 
 	GameManager.advance_dealer()
-	await get_tree().create_timer(0.5).timeout
+	await _wait(0.5)
 	_table.return_to_lobby.rpc()
 
 # ── Broadcasting ──────────────────────────────────────────────────────────────
