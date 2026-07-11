@@ -9,6 +9,9 @@ var turn_timeout_sec: float = 30.0
 var draw_timeout_sec: float = 30.0
 ## 1 = forward through player order, -1 = backward.
 var dealer_rotation: int = 1
+var starting_chips: int = 20000
+var ante_amount: int = 50
+var min_bet: int = 100
 
 func _ready() -> void:
 	var cfg := ConfigFile.new()
@@ -18,6 +21,9 @@ func _ready() -> void:
 	draw_timeout_sec = maxf(cfg.get_value("game", "draw_timeout_sec", draw_timeout_sec), 5.0)
 	var dir: int = cfg.get_value("game", "dealer_rotation", dealer_rotation)
 	dealer_rotation = 1 if dir >= 0 else -1
+	starting_chips = maxi(cfg.get_value("game", "starting_chips", starting_chips), 1)
+	ante_amount = maxi(cfg.get_value("game", "ante", ante_amount), 0)
+	min_bet = maxi(cfg.get_value("game", "min_bet", min_bet), 1)
 
 func _config_path() -> String:
 	var args := OS.get_cmdline_user_args()

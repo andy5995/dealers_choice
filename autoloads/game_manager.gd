@@ -6,12 +6,19 @@ enum GameVariant { FIVE_CARD_DRAW, TEXAS_HOLDEM, SEVEN_CARD_STUD, CALIFORNIA_LOW
 
 var current_variant: GameVariant = GameVariant.TEXAS_HOLDEM
 var deuces_wild: bool = false
-var starting_chips: int = 1000
-var ante_amount: int = 10
-var min_bet: int = 20
+var starting_chips: int = 20000
+var ante_amount: int = 50
+var min_bet: int = 100
 
 var dealer_peer_id: int = 0
 signal dealer_changed(new_dealer_id: int)
+
+
+func _ready() -> void:
+	# Stakes come from server.cfg (Config autoload loads first).
+	starting_chips = Config.starting_chips
+	ante_amount = Config.ante_amount
+	min_bet = Config.min_bet
 
 
 ## Advance the dealer to the next player (server only). Broadcasts to all peers.
