@@ -119,10 +119,4 @@ theme_override_fonts/font = ExtResource("3")
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 
-[node name="NextBtn" type="Button" parent="UI/ResultsOverlay/CenterBox/InnerVBox"]
-text = "Next Hand"
-custom_minimum_size = Vector2(0, 27)
-theme_override_font_sizes/font_size = 13
-
 [connection signal="pressed" from="UI/DrawPanel/ConfirmBtn"                        to="." method="_on_draw_confirm_pressed"]
-[connection signal="pressed" from="UI/ResultsOverlay/CenterBox/InnerVBox/NextBtn" to="." method="_on_results_next_pressed"]

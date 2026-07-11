@@ -78,7 +78,6 @@ var _coin_add_cooldown: float   = 0.0    # time until the next coin may enter
 @onready var _confirm_btn:     Button        = $UI/DrawPanel/ConfirmBtn
 @onready var _results_overlay: Control       = $UI/ResultsOverlay
 @onready var _results_label:   Label         = $UI/ResultsOverlay/CenterBox/InnerVBox/ResultsLabel
-@onready var _next_btn:        Button        = $UI/ResultsOverlay/CenterBox/InnerVBox/NextBtn
 @onready var _clock_timer = $UI/TurnTimer
 
 var _client_time_left: float = 0.0
@@ -352,10 +351,13 @@ func _show_results(results: Dictionary) -> void:
 	_draw_panel.visible = false
 
 	if results.get("final", false):
+		# Game over — auto-returns to the lobby when the server's timeout elapses,
+		# no button click needed. Show the same countdown clock as a hand result.
 		_results_label.text = "%s wins the game!" % results.get("winner_name", "Nobody")
-		_next_btn.text = "Main Menu"
-		_next_btn.visible = true
-		_clock_timer.visible = false
+		_turn_duration = results.get("timeout", 15.0)
+		_client_time_left = _turn_duration
+		_clock_timer.fill_ratio = 1.0
+		_clock_timer.visible = true
 	else:
 		var lines: Array[String] = []
 		for pid in results:
@@ -365,18 +367,11 @@ func _show_results(results: Dictionary) -> void:
 				var pname: String = NetworkManager.player_names.get(pid, "Player")
 				lines.append("%s: %s%s" % [pname, info.get("hand_name", ""), suffix])
 		_results_label.text = "\n".join(lines)
-		_next_btn.visible = false
 		_turn_duration = 15.0
 		_client_time_left = 15.0
 		_clock_timer.fill_ratio = 1.0
 		_clock_timer.visible = true
 	_results_overlay.visible = true
-
-func _on_results_next_pressed() -> void:
-	_results_overlay.visible = false
-	if _next_btn.text == "Main Menu":
-		NetworkManager.disconnect_all()
-		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _on_action_chosen(action: String, amount: int) -> void:
 	if NetworkManager.is_server():

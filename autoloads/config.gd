@@ -12,6 +12,7 @@ var dealer_rotation: int = 1
 var starting_chips: int = 20000
 var ante_amount: int = 50
 var min_bet: int = 100
+var end_of_game_timeout: float = 15.0
 
 func _ready() -> void:
 	var cfg := ConfigFile.new()
@@ -24,6 +25,7 @@ func _ready() -> void:
 	starting_chips = maxi(cfg.get_value("game", "starting_chips", starting_chips), 1)
 	ante_amount = maxi(cfg.get_value("game", "ante", ante_amount), 0)
 	min_bet = maxi(cfg.get_value("game", "min_bet", min_bet), 1)
+	end_of_game_timeout = maxf(cfg.get_value("game", "end_of_game_timeout", end_of_game_timeout), 0.0)
 
 func _config_path() -> String:
 	var args := OS.get_cmdline_user_args()

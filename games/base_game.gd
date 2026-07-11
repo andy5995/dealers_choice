@@ -305,7 +305,10 @@ func _end_hand() -> void:
 
 	if _players.size() < 2:
 		var winner_name: String = _players[0].display_name if _players.size() == 1 else "Nobody"
-		_table.receive_game_over.rpc({"final": true, "winner_name": winner_name})
+		var timeout: float = Config.end_of_game_timeout
+		_table.receive_game_over.rpc({"final": true, "winner_name": winner_name, "timeout": timeout})
+		await _wait(timeout)
+		_table.return_to_lobby.rpc()
 		return
 
 	GameManager.advance_dealer()
