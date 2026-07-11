@@ -45,6 +45,8 @@ const _COIN_PATHS: Array = [
 	"res://assets/images/coins/96x96-Marcus Antonius - Cleopatra 32 BC 90020163_back.png",
 ]
 const MAX_POT_COINS = 40
+const COIN_ADD_INTERVAL := 0.3   # seconds between coins entering the pot (one at a time)
+const COIN_VALUE := 100          # chips represented by one pot coin
 
 ## Layout values computed from viewport size at _ready.
 var _coin_display_size: int  = 48
@@ -63,7 +65,9 @@ var _coin_tex: Texture2D        = null
 var _pot_root: Node2D           = null   # container drawn below seats
 var _pot_sprites: Array         = []     # Sprite2D nodes currently in the pot
 var _pot_positions: Array       = []     # precomputed scatter Vector2s (MAX_POT_COINS)
-var _prev_pot: int              = 0
+var _coin_target: int           = 0      # how many coins the pot should show
+var _coin_actor_idx: int        = -1     # seat the newest coins fly in from (-1 = no fly)
+var _coin_add_cooldown: float   = 0.0    # time until the next coin may enter
 
 @onready var _deuces_label:    Label         = $UI/DeucesLabel
 @onready var _pot_label:       Label         = $UI/PotLabel
@@ -154,6 +158,14 @@ func _process(delta: float) -> void:
 	if _client_time_left > 0.0:
 		_client_time_left = maxf(_client_time_left - delta, 0.0)
 		_clock_timer.fill_ratio = _client_time_left / _turn_duration
+
+	# Feed coins into the pot one at a time, catching up to the target across
+	# frames so only a single coin is ever in flight (matches Dealer's Choice).
+	if _pot_sprites.size() < _coin_target:
+		_coin_add_cooldown = maxf(_coin_add_cooldown - delta, 0.0)
+		if _coin_add_cooldown == 0.0:
+			_spawn_pot_coin()
+			_coin_add_cooldown = COIN_ADD_INTERVAL
 
 func _create_seats() -> void:
 	var my_index := _peer_order.find(_my_peer_id)
@@ -303,7 +315,6 @@ func _apply_public_state(state: Dictionary) -> void:
 
 	_pot_label.text = "Pot: %d" % pot
 	_apply_pot_coins(pot, actor_idx)
-	_prev_pot = pot
 	if actor_idx >= 0:
 		_turn_duration = state.get("turn_duration", 30.0)
 		_client_time_left = state.get("turn_time_left", 0.0)
@@ -396,32 +407,34 @@ func _on_draw_confirm_pressed() -> void:
 func _apply_pot_coins(pot: int, actor_idx: int) -> void:
 	if _coin_tex == null:
 		return
-	var ante: int    = maxi(GameManager.ante_amount, 1)
-	var target: int  = mini(pot / ante, MAX_POT_COINS)
+	# One coin per 100 chips in the pot (matches Dealer's Choice's default feel).
+	_coin_target     = mini(pot / COIN_VALUE, MAX_POT_COINS)
+	_coin_actor_idx  = actor_idx   # seat the next coins fly in from
 
-	# Remove excess sprites (e.g. new hand reset).
-	while _pot_sprites.size() > target:
+	# Remove excess sprites immediately (e.g. pot awarded, new hand reset).
+	while _pot_sprites.size() > _coin_target:
 		(_pot_sprites.pop_back() as Node).queue_free()
+	# Coins below the target are added one at a time by _process.
 
-	# Add new sprites, animating from the actor's seat when pot is rising.
-	while _pot_sprites.size() < target:
-		var idx: int   = _pot_sprites.size()
-		var sp         = Sprite2D.new()
-		sp.texture     = _coin_tex
-		var tex_size   = maxf(_coin_tex.get_width(), _coin_tex.get_height())
-		var scale_f    = float(_coin_display_size) / tex_size
-		sp.scale       = Vector2(scale_f, scale_f)
-		sp.position    = _pot_positions[idx]
-		_pot_root.add_child(sp)
-		_pot_sprites.append(sp)
+func _spawn_pot_coin() -> void:
+	var idx: int   = _pot_sprites.size()
+	var sp         = Sprite2D.new()
+	sp.texture     = _coin_tex
+	var tex_size   = maxf(_coin_tex.get_width(), _coin_tex.get_height())
+	var scale_f    = float(_coin_display_size) / tex_size
+	sp.scale       = Vector2(scale_f, scale_f)
+	sp.rotation    = randf() * TAU   # random resting angle, like DC
+	sp.position    = _pot_positions[idx]
+	_pot_root.add_child(sp)
+	_pot_sprites.append(sp)
 
-		# Animate from actor seat when the pot increased.
-		if pot > _prev_pot and actor_idx >= 0 and actor_idx < _seat_nodes.size():
-			var seat       = _seat_nodes[actor_idx]
-			var start_pos: Vector2 = seat.position + seat.size * 0.5
-			sp.position = start_pos
-			var tw = create_tween()
-			tw.tween_property(sp, "position", _pot_positions[idx], 0.3)
+	# Fly the coin in from the acting player's seat, if known.
+	if _coin_actor_idx >= 0 and _coin_actor_idx < _seat_nodes.size():
+		var seat       = _seat_nodes[_coin_actor_idx]
+		var start_pos: Vector2 = seat.position + seat.size * 0.5
+		sp.position = start_pos
+		var tw = create_tween()
+		tw.tween_property(sp, "position", _pot_positions[idx], COIN_ADD_INTERVAL)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
